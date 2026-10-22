@@ -1,0 +1,156 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1116"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><title>Cadence</title>
+<style>
+:root{--bg:#0e1116;--c:#171c24;--c2:#1f2630;--tx:#e8edf3;--mu:#8b97a6;--ac:#5eead4;--dr:#fb7185;--op:#fbbf24;--ln:#2a3340}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,sans-serif;padding:0 0 150px}
+header{position:sticky;top:0;background:var(--bg);z-index:5;padding:10px 12px 6px;border-bottom:1px solid var(--ln)}
+.top{display:flex;justify-content:space-between;align-items:center}h1{font-size:20px;margin:0;color:var(--ac);letter-spacing:.5px}
+select,input,textarea{background:var(--c2);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:8px;font:inherit}
+.tabs{display:flex;gap:6px;margin-top:8px}.tabs button{flex:1;padding:9px 0;border-radius:8px;border:1px solid var(--ln);background:var(--c);color:var(--mu);font-weight:600}.tabs .on{background:var(--ac);color:#04201c;border-color:var(--ac)}
+main{padding:10px 12px}.ph{color:var(--mu);font-size:13px;margin:4px 0 10px}.ph b{color:var(--ac)}
+.card{background:var(--c);border:1px solid var(--ln);border-radius:12px;padding:10px;margin-bottom:10px}.card.op{border-left:3px solid var(--op)}
+.h{display:flex;gap:8px;align-items:baseline}.cd{background:var(--c2);border-radius:6px;padding:1px 7px;font-size:12px;color:var(--ac);font-weight:700}.nm{font-weight:700;font-size:16px;flex:1}
+.meta{color:var(--mu);font-size:12.5px;margin:3px 0}.last{font-size:12.5px;color:var(--mu)}.hint{font-size:12.5px;color:var(--ac);margin-top:4px}.tag{color:var(--op);font-size:11px;font-weight:700}
+.set{display:grid;grid-template-columns:22px 1fr 1fr 46px;gap:6px;align-items:center;margin-top:6px}.set span{color:var(--mu);text-align:center}.set.d span{color:var(--dr)}
+.set input{width:100%;text-align:center}.ck{height:38px;border-radius:8px;border:1px solid var(--ln);background:var(--c2);color:var(--mu);font-size:18px}.ck.on{background:var(--ac);color:#04201c;border-color:var(--ac)}
+.btn{background:var(--c2);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:8px 12px;font:inherit}.btn.dr{color:var(--dr);border-color:var(--dr);margin-top:8px}
+.note{background:var(--c);border-radius:10px;padding:10px;color:var(--mu);font-size:13px;margin-bottom:10px}
+#tm{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));background:var(--c2);border-top:2px solid var(--ac);padding:10px 12px;display:none;align-items:center;gap:10px;z-index:9}
+#tm .t{font-size:28px;font-weight:800;flex:1;font-variant-numeric:tabular-nums}#tm .t small{display:block;font-size:12px;color:var(--mu);font-weight:400}#tm.go{background:var(--ac);color:#04201c}
+#sheet{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;z-index:20}#sheet>div{background:var(--c);width:100%;max-height:80%;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+#sheet h3{margin:0 0 8px;color:var(--ac)}#sheet h4{margin:12px 0 4px;color:var(--mu);font-size:12px;text-transform:uppercase}#sheet ul{margin:0;padding-left:18px}
+label{display:block;color:var(--mu);font-size:13px;margin:8px 0 3px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--c);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom);z-index:10}nav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0 6px;font-size:11px}nav button span{display:block;font-size:20px}nav .on{color:var(--ac)}.cur{border-color:var(--ac)}.ul{margin:6px 0 0;padding-left:18px;color:var(--mu);font-size:13.5px}.ul li{margin:3px 0}.mu{color:var(--mu);font-size:13.5px}
+</style></head><body>
+<header><div class="top"><h1>CADENCE</h1><select id="wk"></select></div><div class="tabs" id="tabs"></div></header>
+<main id="app"></main><nav id="nav"></nav><div id="tm"></div><div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div id="sb"></div></div>
+<script>
+// [code,name,sets F,B,P,reps,tempo,cat,flags(o=optional,d=drop-set exercise),swap[fromWeek,name,reps,tempo]]
+const DAYS={
+A:{t:'Upper – Push / Pull',n:'Mon',w:'Warm-up 3-5 min incl. band external rotations (2×12 per arm). Ab block 5 min (optional).',r:[
+['1A','Weighted Dips (belt)','3,4,4','6-10','3-0-1-1','H'],['1B','Weighted Pull-ups (belt)','3,4,4','5-8','3-0-1-1','H'],
+['2A','Incline DB Press','3,3,3','8-12','3-1-1-0','M'],['2B','TRX Inverted Row','3,3,3','10-15','2-0-1-2','M'],
+['3A','DB Lateral Raise','3,3,3','12-15','3-0-1-1','I','d'],['3B','TRX Face Pull','2,3,3','12-15','2-0-1-2','I'],
+['4A','Hammer Curl','2,2,2','10-15','3-0-1-1','I','o',[9,'Band Biceps Curl']],
+['4B','TRX Triceps Extension','2,2,2','10-15','3-0-1-1','I','o',[5,'Band Overhead Triceps Extension','12-15','3-1-1-1']]]},
+B:{t:'Lower + Core',n:'Tue',w:'Warm-up 3-5 min incl. 10 band lateral walks each way. Core is built into this day.',r:[
+['1A','DB Front Squat (racked)','3,4,4','8-12','3-1-1-0','H'],['1B','L-Sit (p-bars)','3,3,3','10-20 s','hold','L'],
+['2A','DB Romanian Deadlift','3,4,4','8-12','3-1-1-1','H'],['2B','Ab Wheel Rollout','2,3,3','8-12','3-1-1-0','T'],
+['3A','Bulgarian Split Squat','3,3,3','8-10/leg','3-1-1-0','M'],['3B','TRX Hamstring Curl','3,3,3','10-15','2-0-1-2','T','',[9,'TRX Single-Leg Hamstring Curl','8-12/leg']],
+['4A','Single-Leg Calf Raise (DB)','3,3,3','15-20','3-2-1-1','I','d'],['4B','DB Hip Thrust','2,3,3','10-15','2-0-1-2','M']]},
+C:{t:'TRX Full Body',n:'Thu',w:'Warm-up 3-5 min incl. band lateral walks. Ab block 5 min (optional). Lighter day: stop 2-3 reps short on TRX upper work.',fin:1,r:[
+['1A','TRX Chest Press','3,3,3','10-15','3-1-1-0','C'],['1B','TRX Single-Arm Row','3,3,3','8-12/arm','2-0-1-2','C'],
+['2A','DB Reverse Lunge','3,3,3','8-10/leg','3-0-1-0','M'],['2B','TRX Fallout','3,3,3','8-12','3-1-1-0','T'],
+['3A','TRX Chest Fly','3,3,3','10-15','3-1-1-1','C'],['3B','TRX Y-Raise','3,3,3','10-15','2-0-1-2','T'],
+['4','TRX Single-Leg RDL','3,3,3','8-10/leg','3-1-1-1','M']]},
+D:{t:'Upper Heavy',n:'Fri',w:'Warm-up 3-5 min incl. band external rotations (2×12 per arm). Ab block 5 min (optional).',r:[
+['1A','Weighted Chin-ups (belt)','3,4,4','5-8','3-0-1-1','H'],['1B','DB Bench Press','3,4,4','6-10','3-1-1-0','H'],
+['2A','One-Arm DB Row','3,3,3','6-10','2-1-1-1','M'],['2B','Standing DB Overhead Press','2,3,3','6-10','3-0-1-0','M'],
+['3A','Heavy Band Lat Pulldown','3,3,3','10-15','3-0-1-1','M'],['3B','DB Skull Crusher','2,2,2','10-12','3-1-1-0','I','d'],
+['4A','Incline DB Curl','2,2,2','10-15','3-1-1-0','I','od'],['4B','DB Lateral Raise','3,3,3','12-15','3-0-1-1','I','',[5,'Band Lateral Raise','12-20']],
+['5','Band Face Pull','2,2,2','15-20','2-0-1-2','I','o']]}};
+const REST={H:60,M:45,I:30,T:30,L:30,C:45},RIR={H:['2-3','1-2','1-2','3-4'],M:['2','1-2','1-2','3'],C:['2-3','2-3','2','3'],T:['2','2','1-2','3'],L:['2','2','1-2','3'],I:['1-2','1','0-1','3']};
+const I={ // cues;cues|mistake→fix|progression
+'Weighted Dips (belt)':'Chest focus: lean 20-30° forward. Triceps focus: upright, elbows tucked;Stop near 90° elbows, shoulders down;Pick one style for all 12 weeks|Too deep, shoulders rolled forward → stop higher|+2.5-5 lb when all sets hit 10. Shoulder flares? Use TRX Chest Press',
+'Weighted Pull-ups (belt)':'Start from a full hang, shoulders down;Elbows to hips, chest to bar;1 s pause on top, 3 s down|Half reps → full hang every rep|+2.5-5 lb when all sets hit 8',
+'Incline DB Press':'Bench 30-45°;Elbows about 45-60°;3 s down, 1 s stretch|Bench too steep → lower it|Smallest jump at 12 reps, or 4 s lowering',
+'TRX Inverted Row':'Straight plank body;Lead with the elbows;Squeeze blades 2 s|Sagging hips → squeeze glutes|Feet forward, then feet elevated',
+'DB Lateral Raise':'Lead with elbows, soft bend;Stop at shoulder height;3 s down|Swinging → go lighter|Smallest jump at 15 reps on all sets',
+'TRX Face Pull':'Elbows high;Pull to forehead;Rotate hands out at the end|Pulling to chest → pull higher|Feet forward or longer pause',
+'Hammer Curl':'Elbows pinned;Thumbs up;3 s down|Swinging → go lighter|Reps to 15, then add weight',
+'Band Biceps Curl':'Elbows by sides;Squeeze at the top;3 s down|Swinging → lighter band|Heavier band or wider stance; note band color',
+'TRX Triceps Extension':'Elbows fixed, pointing forward;Plank body;Full lockout|Sagging hips → brace|Walk feet back to make it harder',
+'Band Overhead Triceps Extension':'Elbows by ears;Ribs down;Finish hard, band is tightest|Arching → brace abs|Heavier band or step away; note band color',
+'DB Front Squat (racked)':'Elbows up, upright torso;Knees over toes, heels flat;Pause 1 s in the hole|Torso falls forward → lighter, elbows up|Smallest jump at 12 reps, or 4 s lowering',
+'L-Sit (p-bars)':'Press shoulders down;Chest tall;Breathe steadily|Shoulders shrug → shorter holds|Tuck → one leg → both. Add 2-3 s weekly',
+'DB Romanian Deadlift':'Hips back, dumbbells close;Neutral spine, soft knees;Squeeze glutes at the top|Rounding → shorten range|Smallest jump at 12 reps',
+'Ab Wheel Rollout':'Ribs down, glutes tight;Short range beats sagging;Pull back with the abs|Low back sags → shorten|Longer roll-out or a pause',
+'Bulgarian Split Squat':'Weight on front foot;Knee over toes;Straight up and down|Stance too short → step out|Smallest jump at 10 per leg',
+'TRX Hamstring Curl':'Hips high all rep;Squeeze glutes;2 s each way|Hips drop → lift and squeeze|Single-leg version from Week 9',
+'TRX Single-Leg Hamstring Curl':'Hips level;Squeeze the glute;Slow extension|Hips rotate → smaller range|Add reps or a pause',
+'Single-Leg Calf Raise (DB)':'Full stretch, 2 s pause;Rise straight up;Hold top 1 s|Bouncing → pause at the bottom|Reps to 20, then add weight',
+'DB Hip Thrust':'Chin tucked, ribs down;Push through heels;Squeeze 2 s at the top|Overarching → tuck ribs|Add weight or go single-leg',
+'TRX Chest Press':'Straight plank body;Elbows about 45°;Squeeze at lockout|Hips pike or sag → brace|Feet forward or elevated',
+'TRX Single-Arm Row':'Hips and shoulders square;Elbow to hip;Resist rotation|Torso twists → slow down|Feet forward or elevated',
+'DB Reverse Lunge':'Long step back;Chest up;Drive through the front heel|Short step → lengthen it|Smallest jump at 10 per leg',
+'TRX Fallout':'Ribs down, glutes tight;Straight line;Pull back with the abs|Back sags → shorter range|Feet back or add a pause',
+'TRX Chest Fly':'Soft elbows, fixed bend;Hug a big tree;Stop at a comfortable stretch|Bending elbows → keep fixed|Feet forward. Stop at any shoulder pinch',
+'TRX Y-Raise':'Arms straight, thumbs up;Shoulders down;Hold 2 s|Shrugging → press shoulders down|Feet forward',
+'TRX Single-Leg RDL':'Back flat, hips square;Light grip on straps;Squeeze the glute|Hips open up → square them|Less strap help or hold a dumbbell',
+'Weighted Chin-ups (belt)':'Underhand, shoulders down;Chest to bar;3 s down|Half reps → full hang|+2.5-5 lb when all sets hit 8. Elbows ache? Use neutral grip',
+'DB Bench Press':'Blades pinned, feet planted;Elbows about 45°;Pause 1 s on the chest|Bouncing → pause|Smallest jump at 10 reps',
+'One-Arm DB Row':'Flat back;Pull to the hip;No torso twist|Rotating → brace and slow down|Smallest jump at 10 reps',
+'Standing DB Overhead Press':'Ribs down, glutes tight;Press straight up;Biceps by the ears|Arching → brace|Smallest jump at 10 reps. Neutral grip is fine',
+'Heavy Band Lat Pulldown':'Elbows to ribs;Chest tall;Control the return|Pulling with arms only → lead with elbows|Heavier band or step back',
+'DB Skull Crusher':'Elbows fixed, pointing up;Neutral wrists;3 s down|Elbows flare → keep them up|Reps first, then weight. Elbow pain? Stop',
+'Incline DB Curl':'Elbows behind the body;Full stretch;No swing|Elbows drift forward → pin them|Reps to 15, then add weight',
+'Band Lateral Raise':'Stand on the band;Lead with elbows;Hold top 1 s|Shrugging → lighter band|Heavier band; note band color',
+'Band Face Pull':'Elbows high;Pull to forehead;Rotate hands out|Pulling to chest → pull higher|Heavier band'};
+const DSW=[6,7,9,10,11],$=s=>document.querySelector(s);
+let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];if(S.wk==null)S.wk=0;
+const sv=()=>localStorage.setItem('cad',JSON.stringify(S));
+const dow=new Date().getDay();let tab={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow]||'A';
+function ph(w){const rs=[4,8,12].includes(w),i=w>=9&&w<=11?2:w>=5&&w<=8?1:0;return{rs,i,k:w==12?'D':rs?'R':'FBP'[i],nm:w==0?'Calibration':w==12?'Deload':rs?'Reset':['Foundation','Build','Peak'][i]}}
+function ex(r,w){const p=ph(w);let n=r[1],reps=r[3],t=r[4],sw=r[7];if(sw&&w>=sw[0]){n=sw[1];reps=sw[2]||reps;t=sw[3]||t}
+const b=+r[2].split(',')[p.i],f=r[6]||'';return{c:r[0],n,reps,t,cat:r[5],o:f.includes('o'),ds:f.includes('d'),s:p.rs?Math.max(1,b-1):b,rir:p.k=='D'?'4':RIR[r[5]][p.k=='R'?3:p.i]}}
+const BL={Calibration:'Week 0: find starting loads you can lift for the target reps with 2-3 reps in reserve. Do not go to failure.',Foundation:'Foundation: add reps inside the range before adding weight.',Reset:'Reset: one fewer set, same loads, 3-4 reps in reserve.',Build:'Build: key lifts gain a set.',Peak:'Peak: heavy lifts stay 1-2 reps short; isolation can reach 0-1.',Deload:'Deload: about 80% of Week 11 loads, 4 reps in reserve, no testing.'};
+function pel(w){const p=ph(w);return w==12?'20 min easy ride (RPE 3-4) or skip':p.rs?'20 min: 3 min warm-up, 8 × (30 s hard / 60 s easy), cool-down. Hard = RPE 7':p.i==0?'20 min: 3 min warm-up, 10 × (30 s hard / 60 s easy), 2 min cool-down. Hard = RPE 7-8':p.i==1?'20 min: 3 min warm-up, 10 × (40 s hard / 50 s easy), 2 min cool-down. Hard = RPE 8':'20 min: 3 min warm-up, 10 × (45 s on / 45 s off), 2 min cool-down. RPE 8, not all-out'}
+const key=(w,d,n)=>w+'|'+d+'|'+n;
+function lg(k,n){const a=S.logs[k]=S.logs[k]||[];while(a.filter(x=>!x.d).length<n)a.splice(a.filter(x=>!x.d).length,0,{w:'',r:'',k:0});return a}
+function last(w,d,n){for(let x=w-1;x>=0;x--){const a=S.logs[key(x,d,n)];if(a&&a.some(s=>s.w||s.r))return a.filter(s=>s.w||s.r)}return null}
+function workout(){const w=S.wk,p=ph(w);
+$('#tabs').innerHTML=['A','B','W','C','D'].map(t=>`<button class="${t==tab?'on':''}" onclick="tab='${t}';render()">${t=='W'?'Wed':DAYS[t].n}</button>`).join('');
+let h=`<div class="ph"><b>Week ${w} · ${p.nm}</b> · ${BL[p.nm]}${DSW.includes(w)?' Drop sets (+) on marked lifts.':''}${w==11?' Week 11 is your retest week: log best sets.':''}</div>`;
+if(tab=='W')h+=`<div class="card"><div class="nm">Peloton HIIT</div><div class="meta">${pel(w)}</div></div><div class="note">A mid-week break from lifting. If lifts feel grindy, use the Week 4 ride.</div>`;
+else{const D=DAYS[tab];h+=`<div class="note"><b>${D.t}</b><br>${D.w}</div>`;
+D.r.forEach(r=>{const e=ex(r,w),k=key(w,tab,e.n),L=lg(k,e.s),ls=last(w,tab,e.n),top=parseInt(e.reps.split('-')[1]),rs=S.rest[e.n]||REST[e.cat],ws=L.filter(s=>!s.d);
+let hint='';if(ws.every(s=>s.k)&&ws.length){const f=ws[0].w;if(ws.some(s=>s.w!=f))hint='↓ Weight dropped on a set. Keep this load next time.';else if(f&&ws.every(s=>+s.r>=top))hint='✓ Top of range on every set. Add weight next session.'}
+h+=`<div class="card ${e.o?'op':''}"><div class="h"><span class="cd">${e.c}</span><span class="nm" onclick="info('${e.n.replace(/'/g,"\\'")}')">${e.n} ⓘ</span>${e.o?'<span class="tag">OPTIONAL</span>':''}</div><div class="meta">${e.s} × ${e.reps} · tempo ${e.t} · rest ${rs}s · RIR ${e.rir}</div>${ls?`<div class="last">Last: ${ls.map(s=>(s.w||'–')+'×'+(s.r||'–')).join(', ')}</div>`:''}`;
+L.forEach((s,i)=>{const pl=ls&&ls[i]?ls[i]:{};h+=`<div class="set ${s.d?'d':''}"><span>${s.d?'↓':i+1}</span><input inputmode="decimal" placeholder="${pl.w||'lb'}" value="${s.w}" onchange="inp('${k}',${i},'w',this.value)"><input inputmode="numeric" placeholder="${pl.r||'reps'}" value="${s.r}" onchange="inp('${k}',${i},'r',this.value)"><button class="ck ${s.k?'on':''}" onclick="chk('${k}',${i},'${e.n.replace(/'/g,"\\'")}',${rs})">✓</button></div>`});
+if(e.ds&&DSW.includes(w))h+=`<button class="btn dr" onclick="drop('${k}')">+ Drop set</button>`;
+h+=`${hint?`<div class="hint">${hint}</div>`:''}</div>`});
+if(D.fin&&!p.rs)h+=`<div class="card op"><span class="tag">OPTIONAL FINISHER</span><div class="meta">5 min non-stop: 10 TRX squats + 10 mountain climbers, repeat. Skip first when short on time.</div></div>`;
+h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div>`}
+return h}
+function inp(k,i,f,v){S.logs[k][i][f]=v;sv()}
+function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];s.k=s.k?0:1;
+if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y)}
+function drop(k){S.logs[k].push({w:'',r:'',k:0,d:1});sv();const y=scrollY;render();scrollTo(0,y)}
+let AC,T={},WL;async function wl(){try{WL=await navigator.wakeLock.request('screen')}catch(e){}}
+function start(sec,n){clearInterval(T.iv);T={n,b:sec,end:Date.now()+sec*1000};$('#tm').style.display='flex';$('#tm').className='';T.iv=setInterval(tick,250);tick()}
+function tick(){const r=Math.ceil((T.end-Date.now())/1000),m=$('#tm');if(r<=0&&m.className!='go'){m.className='go';beep();setTimeout(()=>{if(m.className=='go')stop()},6000)}
+const v=Math.max(0,r);m.innerHTML=`<div class="t">${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}<small>${m.className=='go'?'GO – next set':T.n}</small></div><button class="btn" onclick="adj(-15)">−15</button><button class="btn" onclick="adj(15)">+15</button><button class="btn" onclick="stop()">Skip</button>`}
+function adj(d){T.end+=d*1000;T.b=Math.max(15,T.b+d);S.rest[T.n]=T.b;sv();$('#tm').className='';tick()}
+function stop(){clearInterval(T.iv);$('#tm').style.display='none'}
+function beep(){try{[0,.25,.5].forEach(t=>{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,AC.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t+.2);o.start(AC.currentTime+t);o.stop(AC.currentTime+t+.22)})}catch(e){}navigator.vibrate&&navigator.vibrate([200,100,200])}
+function info(n){const x=(I[n]||'No card yet|| ').split('|'),c=x[0].split(';');$('#sb').innerHTML=`<h3>${n}</h3><h4>Cues</h4><ul>${c.map(t=>`<li>${t}</li>`).join('')}</ul><h4>Common mistake</h4>${x[1]||''}<h4>Progression</h4>${x[2]||''}<p style="color:var(--mu);font-size:12px;margin-top:14px">Full setup and safety notes are in the program document.</p>`;$('#sheet').style.display='flex'}
+const NV=[['home','🏠','Home'],['wo','🏋️','Workout'],['wk','📅','Weeks'],['log','📈','Log'],['guide','ℹ️','Guide']];let v='home';
+function go(k){v=k;scrollTo(0,0);render()}
+function render(){$('#nav').innerHTML=NV.map(x=>`<button class="${v==x[0]?'on':''}" onclick="go('${x[0]}')"><span>${x[1]}</span>${x[2]}</button>`).join('');const t=$('#tabs');t.style.display=v=='wo'?'flex':'none';if(v!='wo')t.innerHTML='';$('#wk').style.display=(v=='wo'||v=='home')?'':'none';$('#app').innerHTML=({home,wk:weeks,log:logv,guide,wo:workout})[v]()}
+function home(){const w=S.wk,p=ph(w),td={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow];
+return`<div class="card"><h2 style="margin:0 0 4px;color:var(--ac)">Cadence</h2><div class="mu">A 12-week recomposition program: build muscle and strength while staying lean. Four lifting days plus one 20-minute HIIT ride each week, about 45 minutes per session.</div></div>
+<div class="card"><div class="meta">This week</div><div class="nm">Week ${w} · ${p.nm}</div><div class="mu">${BL[p.nm]}</div><button class="btn" style="margin-top:8px" onclick="tab='${td||'A'}';go('wo')">${td?'Open today’s session':'Open Monday’s session'}</button></div>
+<div class="card"><div class="nm">Weekly schedule</div>${[['Mon','A','Upper push / pull'],['Tue','B','Lower + core'],['Wed','W','Peloton HIIT'],['Thu','C','TRX full body'],['Fri','D','Upper heavy']].map(x=>`<div class="mu" style="padding:4px 0" onclick="tab='${x[1]}';go('wo')"><b>${x[0]}</b> · ${x[2]}</div>`).join('')}<div class="mu">Sat / Sun: rest</div></div>
+<div class="card"><div class="nm">How it works</div><ul class="ul"><li>Check off a set to start the rest timer. Adjust it ±15 s and the change is remembered.</li><li>Every set has its own weight and reps. Lower a set if you need to.</li><li>Tap an exercise name for cues, the top mistake and progression.</li><li>Start with Week 0 to find your loads, then follow Weeks 1-12.</li><li>Log body weight and weekly check-ins in the Log tab.</li></ul></div>`}
+function dn(w){return['A','B','C','D'].filter(d=>Object.keys(S.logs).some(k=>k.startsWith(w+'|'+d+'|')&&S.logs[k].some(s=>s.k))).length}
+function weeks(){return'<div class="note">Tap a week to open it.</div>'+Array.from({length:13},(_,w)=>{const p=ph(w);return`<div class="card ${w==S.wk?'cur':''}" onclick="S.wk=${w};sv();$('#wk').value=${w};go('wo')"><div class="h"><span class="cd">${w}</span><span class="nm">${p.nm}</span><span class="meta">${dn(w)}/4 sessions</span></div><div class="mu">${BL[p.nm]}${DSW.includes(w)?' Drop sets on.':''}${w==11?' Retest week.':''}</div></div>`}).join('')}
+function sess(){const m={};Object.keys(S.logs).forEach(k=>{const a=k.split('|'),n=S.logs[k].filter(x=>x.k).length;if(n)m[a[0]+'|'+a[1]]=(m[a[0]+'|'+a[1]]||0)+n});return Object.keys(m).sort((a,b)=>{const x=a.split('|'),y=b.split('|');return y[0]-x[0]||y[1].localeCompare(x[1])}).slice(0,8).map(q=>{const a=q.split('|');return`<div class="mu">Wk ${a[0]} · ${DAYS[a[1]].n} ${DAYS[a[1]].t}: ${m[q]} sets checked</div>`}).join('')||'<div class="mu">No sessions yet.</div>'}
+function logv(w){const B=S.bw,td=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10),c=S.ci[w]||{},f=(k,l)=>`<div><label>${l}</label><input inputmode="decimal" value="${c[k]||''}" onchange="ci(${w},'${k}',this.value)"></div>`;
+const tr=B.length>1?`<div class="hint">Latest ${B[B.length-1].v} lb · ${(B[B.length-1].v-B[0].v>=0?'+':'')+(B[B.length-1].v-B[0].v).toFixed(1)} lb since ${B[0].d}</div>`:'';
+const ch=Object.keys(S.ci).sort((a,b)=>a-b).map(k=>`<div class="mu">Wk ${k}: waist ${S.ci[k].wa||'–'} · RHR ${S.ci[k].hr||'–'} · shoulder ${S.ci[k].sh||'–'}/10${S.ci[k].nt?' · '+S.ci[k].nt:''}</div>`).join('');
+return`<div class="card"><div class="nm">Body weight</div><div class="row2"><div><label>Weight (lb)</label><input id="bwv" inputmode="decimal"></div><div><label>Date</label><input id="bwd" type="date" value="${td}"></div></div><button class="btn" style="margin-top:8px" onclick="addbw()">Save weight</button>${tr}${B.slice(-8).reverse().map(x=>`<div class="mu">${x.d} · ${x.v} lb <span onclick="delbw('${x.d}')" style="float:right;color:var(--dr)">✕</span></div>`).join('')}</div>
+<div class="card"><div class="nm">Week ${w} check-in</div><div class="row2">${f('wa','Waist (in)')}${f('hr','Resting HR')}${f('sh','Shoulder 0-10')}</div><label>Notes (sleep, soreness, energy)</label><textarea style="width:100%" rows="2" onchange="ci(${w},'nt',this.value)">${c.nt||''}</textarea>${ch}</div>
+<div class="card"><div class="nm">Recent sessions</div>${sess()}</div>`}
+function addbw(){const x=parseFloat($('#bwv').value),d=$('#bwd').value;if(!x||!d)return;S.bw=S.bw.filter(y=>y.d!=d);S.bw.push({d,v:x});S.bw.sort((a,b)=>a.d.localeCompare(b.d));sv();render()}
+function delbw(d){S.bw=S.bw.filter(y=>y.d!=d);sv();render()}
+function guide(){return`<div class="card"><div class="nm">Rest</div><div class="mu">60 s after heavy lifts, 45 s moderate, 30 s isolation, TRX and core. Adjust the timer ±15 s when needed.</div></div>
+<div class="card"><div class="nm">Tempo and RIR</div><div class="mu">Tempo is four numbers: seconds lowering, pause at the bottom, seconds lifting, hold at the top. RIR is reps left in the tank.</div></div>
+<div class="card"><div class="nm">Progression</div><div class="mu">Add the smallest weight jump when every set reaches the top of the rep range at the target RIR. If weights are maxed: slow the lowering, add a pause, go single-limb, or add band tension.</div></div>
+<div class="card"><div class="nm">Phases</div><ul class="ul"><li>Week 0: calibrate loads, no failure</li><li>Weeks 1-3: Foundation</li><li>Week 4: Reset (one fewer set)</li><li>Weeks 5-7: Build (drop sets from Week 6)</li><li>Week 8: Reset</li><li>Weeks 9-11: Peak (Week 11 retest)</li><li>Week 12: Deload</li></ul></div>
+<div class="card"><div class="nm">Short on time</div><div class="mu">Skip in this order: optional work, the Thursday finisher, then shorten the ab block. Tired week? Cut Thursday’s TRX chest fly, optional pairs, then one set from each isolation exercise.</div></div>
+<div class="card"><div class="nm">Backup</div><div class="mu">Data is stored on this phone only. Export regularly.</div><button class="btn" style="margin-top:8px" onclick="exp()">Export</button> <label class="btn" style="display:inline-block">Import<input type="file" accept=".json" hidden onchange="imp(this.files[0])"></label></div>`}
+function ci(w,k,v){(S.ci[w]=S.ci[w]||{})[k]=v;sv()}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='cadence-backup.json';a.click()}
+function imp(f){const r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);sv();render()}catch(e){alert('Invalid file')}};r.readAsText(f)}
+$('#wk').innerHTML=Array.from({length:13},(_,i)=>`<option value="${i}">Week ${i}${i==0?' (calibrate)':''}</option>`).join('');$('#wk').value=S.wk;$('#wk').onchange=e=>{S.wk=+e.target.value;sv();render()};
+render();if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');
+</script></body></html>
