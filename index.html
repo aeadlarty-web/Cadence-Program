@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1116"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><title>Cadence</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1116"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><title>Forge</title>
 <style>
 :root{--bg:#0e1116;--c:#171c24;--c2:#1f2630;--tx:#e8edf3;--mu:#8b97a6;--ac:#5eead4;--dr:#fb7185;--op:#fbbf24;--ln:#2a3340}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,sans-serif;padding:0 0 150px}
@@ -20,8 +20,9 @@ main{padding:10px 12px}.ph{color:var(--mu);font-size:13px;margin:4px 0 10px}.ph 
 #sheet h3{margin:0 0 8px;color:var(--ac)}#sheet h4{margin:12px 0 4px;color:var(--mu);font-size:12px;text-transform:uppercase}#sheet ul{margin:0;padding-left:18px}
 label{display:block;color:var(--mu);font-size:13px;margin:8px 0 3px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--c);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom);z-index:10}nav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0 6px;font-size:11px}nav button span{display:block;font-size:20px}nav .on{color:var(--ac)}.cur{border-color:var(--ac)}.ul{margin:6px 0 0;padding-left:18px;color:var(--mu);font-size:13.5px}.ul li{margin:3px 0}.mu{color:var(--mu);font-size:13.5px}
+@keyframes slL{from{transform:translateX(40px);opacity:.3}to{transform:none;opacity:1}}@keyframes slR{from{transform:translateX(-40px);opacity:.3}to{transform:none;opacity:1}}
 </style></head><body>
-<header><div class="top"><h1>CADENCE</h1><select id="wk"></select></div><div class="tabs" id="tabs"></div></header>
+<header><div class="top"><h1>FORGE</h1><select id="wk"></select></div><div class="tabs" id="tabs"></div></header>
 <main id="app"></main><nav id="nav"></nav><div id="tm"></div><div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div id="sb"></div></div>
 <script>
 // [code,name,sets F,B,P,reps,tempo,cat,flags(o=optional,d=drop-set exercise),swap[fromWeek,name,reps,tempo]]
@@ -36,7 +37,7 @@ B:{t:'Lower + Core',n:'Tue',w:'Warm-up 3-5 min incl. 10 band lateral walks each 
 ['1A','DB Front Squat (racked)','3,4,4','8-12','3-1-1-0','H'],['1B','L-Sit (p-bars)','3,3,3','10-20 s','hold','L'],
 ['2A','DB Romanian Deadlift','3,4,4','8-12','3-1-1-1','H'],['2B','Ab Wheel Rollout','2,3,3','8-12','3-1-1-0','T'],
 ['3A','Bulgarian Split Squat','3,3,3','8-10/leg','3-1-1-0','M'],['3B','TRX Hamstring Curl','3,3,3','10-15','2-0-1-2','T','',[9,'TRX Single-Leg Hamstring Curl','8-12/leg']],
-['4A','Single-Leg Calf Raise (DB)','3,3,3','15-20','3-2-1-1','I','d'],['4B','DB Hip Thrust','2,3,3','10-15','2-0-1-2','M']]},
+['4A','Single-Leg Calf Raise (DB)','3,3,3','15-20/leg','3-2-1-1','I','d'],['4B','DB Hip Thrust','2,3,3','10-15','2-0-1-2','M']]},
 C:{t:'TRX Full Body',n:'Thu',w:'Warm-up 3-5 min incl. band lateral walks. Ab block 5 min (optional). Lighter day: stop 2-3 reps short on TRX upper work.',fin:1,r:[
 ['1A','TRX Chest Press','3,3,3','10-15','3-1-1-0','C'],['1B','TRX Single-Arm Row','3,3,3','8-12/arm','2-0-1-2','C'],
 ['2A','DB Reverse Lunge','3,3,3','8-10/leg','3-0-1-0','M'],['2B','TRX Fallout','3,3,3','8-12','3-1-1-0','T'],
@@ -44,7 +45,7 @@ C:{t:'TRX Full Body',n:'Thu',w:'Warm-up 3-5 min incl. band lateral walks. Ab blo
 ['4','TRX Single-Leg RDL','3,3,3','8-10/leg','3-1-1-1','M']]},
 D:{t:'Upper Heavy',n:'Fri',w:'Warm-up 3-5 min incl. band external rotations (2×12 per arm). Ab block 5 min (optional).',r:[
 ['1A','Weighted Chin-ups (belt)','3,4,4','5-8','3-0-1-1','H'],['1B','DB Bench Press','3,4,4','6-10','3-1-1-0','H'],
-['2A','One-Arm DB Row','3,3,3','6-10','2-1-1-1','M'],['2B','Standing DB Overhead Press','2,3,3','6-10','3-0-1-0','M'],
+['2A','One-Arm DB Row','3,3,3','6-10/arm','2-1-1-1','M'],['2B','Standing DB Overhead Press','2,3,3','6-10','3-0-1-0','M'],
 ['3A','Heavy Band Lat Pulldown','3,3,3','10-15','3-0-1-1','M'],['3B','DB Skull Crusher','2,2,2','10-12','3-1-1-0','I','d'],
 ['4A','Incline DB Curl','2,2,2','10-15','3-1-1-0','I','od'],['4B','DB Lateral Raise','3,3,3','12-15','3-0-1-1','I','',[5,'Band Lateral Raise','12-20']],
 ['5','Band Face Pull','2,2,2','15-20','2-0-1-2','I','o']]}};
@@ -86,7 +87,7 @@ const I={ // cues;cues|mistake→fix|progression
 'Band Lateral Raise':'Stand on the band;Lead with elbows;Hold top 1 s|Shrugging → lighter band|Heavier band; note band color',
 'Band Face Pull':'Elbows high;Pull to forehead;Rotate hands out|Pulling to chest → pull higher|Heavier band'};
 const DSW=[6,7,9,10,11],$=s=>document.querySelector(s);
-let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];if(S.wk==null)S.wk=0;
+let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];S.pr=S.pr||{};if(S.wk==null)S.wk=0;
 const sv=()=>localStorage.setItem('cad',JSON.stringify(S));
 const dow=new Date().getDay();let tab={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow]||'A';
 function ph(w){const rs=[4,8,12].includes(w),i=w>=9&&w<=11?2:w>=5&&w<=8?1:0;return{rs,i,k:w==12?'D':rs?'R':'FBP'[i],nm:w==0?'Calibration':w==12?'Deload':rs?'Reset':['Foundation','Build','Peak'][i]}}
@@ -109,11 +110,21 @@ L.forEach((s,i)=>{const pl=ls&&ls[i]?ls[i]:{};h+=`<div class="set ${s.d?'d':''}"
 if(e.ds&&DSW.includes(w))h+=`<button class="btn dr" onclick="drop('${k}')">+ Drop set</button>`;
 h+=`${hint?`<div class="hint">${hint}</div>`:''}</div>`});
 if(D.fin&&!p.rs)h+=`<div class="card op"><span class="tag">OPTIONAL FINISHER</span><div class="meta">5 min non-stop: 10 TRX squats + 10 mountain climbers, repeat. Skip first when short on time.</div></div>`;
-h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div>`}
+h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div><button class="btn" style="width:100%;padding:12px" onclick="finish(tab)">Finish workout 🐼</button>`}
 return h}
+const PW=330,PM={'Incline DB Press':[2,1],'DB Bench Press':[2,1],'DB Lateral Raise':[2,1],'Hammer Curl':[2,1],'Incline DB Curl':[2,1],'DB Front Squat (racked)':[2,1],'DB Romanian Deadlift':[2,1],'Standing DB Overhead Press':[2,1],'DB Skull Crusher':[1,1],'DB Hip Thrust':[1,1],'One-Arm DB Row':[1,2],'Single-Leg Calf Raise (DB)':[1,2],'Bulgarian Split Squat':[2,2],'DB Reverse Lunge':[2,2],'Weighted Dips (belt)':'B','Weighted Pull-ups (belt)':'B','Weighted Chin-ups (belt)':'B'};
+const pd=t=>(t/PW).toFixed(1),fm=t=>Math.round(t).toLocaleString(),show=h=>{$('#sb').innerHTML=h;$('#sheet').style.display='flex'},cl=`<button class="btn" style="margin-top:14px" onclick="$('#sheet').style.display='none'">Close</button>`;
+function vol(w,d){let t=0,nb=0;const bw=S.bw.length?S.bw[S.bw.length-1].v:0;Object.keys(S.logs).forEach(k=>{const a=k.split('|'),m=PM[a[2]];if(a[0]!=w||a[1]!=d||!m)return;S.logs[k].forEach(x=>{const r=+x.r,wt=+x.w||0;if(!x.k||!r)return;if(m=='B'){if(!bw)nb=1;t+=(wt+bw)*r}else if(wt)t+=wt*m[0]*r*m[1]})});return{t:Math.round(t),nb}}
+function wvol(w){const o=['A','B','C','D'].map(d=>Object.assign({d},vol(w,d)));return{days:o,t:o.reduce((x,y)=>x+y.t,0),nb:o.some(x=>x.nb)}}
+function reqDone(w,d){return DAYS[d].r.filter(r=>!(r[6]||'').includes('o')).every(r=>{const e=ex(r,w),L=(S.logs[key(w,d,e.n)]||[]).filter(x=>!x.d);return L.length>=e.s&&L.slice(0,e.s).every(x=>x.k)})}
+function weekHtml(k,w){const b=k.days.reduce((x,y)=>y.t>x.t?y:x,{t:0});return`<h4>Week ${w} report</h4><div class="nm" style="font-size:22px">${fm(k.t)} lb · ${pd(k.t)} 🐼</div>${k.days.map(x=>`<div class="mu">${DAYS[x.d].n} ${DAYS[x.d].t}: ${fm(x.t)} lb · ${pd(x.t)} pandas</div>`).join('')}${b.t?`<div class="hint">Biggest day: ${DAYS[b.d].n} ${DAYS[b.d].t}</div>`:''}${k.nb?'<div class="hint">Log your body weight in the Log tab to include it on dips and pull-ups.</div>':''}`}
+function finish(d,auto){const w=S.wk,a=vol(w,d),k=wvol(w);show(`<h3>🐼 ${auto?'All required sets done!':'Workout complete'}</h3><div class="nm" style="font-size:26px">${fm(a.t)} lb</div><div class="mu">${pd(a.t)} Giant Pandas lifted today</div>${a.nb?'<div class="hint">Log your body weight in the Log tab to include it on dips and pull-ups.</div>':''}${d=='D'?weekHtml(k,w):`<div class="mu" style="margin-top:10px">Week ${w} so far: ${fm(k.t)} lb · ${pd(k.t)} pandas</div>`}${cl}`)}
+function weekRep(w){show(weekHtml(wvol(w),w)+cl)}
+function pbtn(w){const t=wvol(w).t;return t?`<button class="btn" style="margin-top:8px" onclick="event.stopPropagation();weekRep(${w})">🐼 ${pd(t)} pandas · report</button>`:''}
+function pandaCard(){let all=0,rows='';for(let w=0;w<=12;w++){const t=wvol(w).t;all+=t;if(t)rows+=`<div class="mu" style="padding:3px 0" onclick="weekRep(${w})">Week ${w}: ${fm(t)} lb · ${pd(t)} 🐼 ›</div>`}return`<div class="card"><div class="nm">🐼 Panda report</div><div class="mu">All-time: ${fm(all)} lb · ${pd(all)} Giant Pandas (330 lb each)</div>${rows||'<div class="mu">Finish a workout to start counting.</div>'}<div class="mu" style="margin-top:6px;font-size:12px">Estimate: belt lifts include your latest logged body weight. TRX, bands and core are not counted.</div></div>`}
 function inp(k,i,f,v){S.logs[k][i][f]=v;sv()}
 function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];s.k=s.k?0:1;
-if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y)}
+if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y);if(s.k&&tab!='W'&&!S.pr[S.wk+'|'+tab]&&reqDone(S.wk,tab)){S.pr[S.wk+'|'+tab]=1;sv();finish(tab,1)}}
 function drop(k){S.logs[k].push({w:'',r:'',k:0,d:1});sv();const y=scrollY;render();scrollTo(0,y)}
 let AC,T={},WL;async function wl(){try{WL=await navigator.wakeLock.request('screen')}catch(e){}}
 function start(sec,n){clearInterval(T.iv);T={n,b:sec,end:Date.now()+sec*1000};$('#tm').style.display='flex';$('#tm').className='';T.iv=setInterval(tick,250);tick()}
@@ -124,22 +135,25 @@ function stop(){clearInterval(T.iv);$('#tm').style.display='none'}
 function beep(){try{[0,.25,.5].forEach(t=>{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,AC.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t+.2);o.start(AC.currentTime+t);o.stop(AC.currentTime+t+.22)})}catch(e){}navigator.vibrate&&navigator.vibrate([200,100,200])}
 function info(n){const x=(I[n]||'No card yet|| ').split('|'),c=x[0].split(';');$('#sb').innerHTML=`<h3>${n}</h3><h4>Cues</h4><ul>${c.map(t=>`<li>${t}</li>`).join('')}</ul><h4>Common mistake</h4>${x[1]||''}<h4>Progression</h4>${x[2]||''}<p style="color:var(--mu);font-size:12px;margin-top:14px">Full setup and safety notes are in the program document.</p>`;$('#sheet').style.display='flex'}
 const NV=[['home','🏠','Home'],['wo','🏋️','Workout'],['wk','📅','Weeks'],['log','📈','Log'],['guide','ℹ️','Guide']];let v='home';
-function go(k){v=k;scrollTo(0,0);render()}
+function go(k,d){v=k;scrollTo(0,0);render();if(d){const a=$('#app');a.style.animation='none';a.offsetWidth;a.style.animation=(d>0?'slL':'slR')+' .2s ease-out'}}
+const ORD=['home','wo','wk','log','guide'];let tx=0,ty=0,tg=null;
+document.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;tg=e.target.closest('input,textarea,select,#sheet,#tm')},{passive:true});
+document.addEventListener('touchend',e=>{if(tg||$('#sheet').style.display=='flex')return;const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6){const i=ORD.indexOf(v)+(dx<0?1:-1);if(i>=0&&i<ORD.length)go(ORD[i],dx<0?1:-1)}},{passive:true});
 function render(){$('#nav').innerHTML=NV.map(x=>`<button class="${v==x[0]?'on':''}" onclick="go('${x[0]}')"><span>${x[1]}</span>${x[2]}</button>`).join('');const t=$('#tabs');t.style.display=v=='wo'?'flex':'none';if(v!='wo')t.innerHTML='';$('#wk').style.display=(v=='wo'||v=='home')?'':'none';$('#app').innerHTML=({home,wk:weeks,log:logv,guide,wo:workout})[v]()}
 function home(){const w=S.wk,p=ph(w),td={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow];
-return`<div class="card"><h2 style="margin:0 0 4px;color:var(--ac)">Cadence</h2><div class="mu">A 12-week recomposition program: build muscle and strength while staying lean. Four lifting days plus one 20-minute HIIT ride each week, about 45 minutes per session.</div></div>
+return`<div class="card"><h2 style="margin:0 0 4px;color:var(--ac)">Forge</h2><div class="mu">A 12-week recomposition program: build muscle and strength while staying lean. Four lifting days plus one 20-minute HIIT ride each week, about 45 minutes per session.</div></div>
 <div class="card"><div class="meta">This week</div><div class="nm">Week ${w} · ${p.nm}</div><div class="mu">${BL[p.nm]}</div><button class="btn" style="margin-top:8px" onclick="tab='${td||'A'}';go('wo')">${td?'Open today’s session':'Open Monday’s session'}</button></div>
 <div class="card"><div class="nm">Weekly schedule</div>${[['Mon','A','Upper push / pull'],['Tue','B','Lower + core'],['Wed','W','Peloton HIIT'],['Thu','C','TRX full body'],['Fri','D','Upper heavy']].map(x=>`<div class="mu" style="padding:4px 0" onclick="tab='${x[1]}';go('wo')"><b>${x[0]}</b> · ${x[2]}</div>`).join('')}<div class="mu">Sat / Sun: rest</div></div>
-<div class="card"><div class="nm">How it works</div><ul class="ul"><li>Check off a set to start the rest timer. Adjust it ±15 s and the change is remembered.</li><li>Every set has its own weight and reps. Lower a set if you need to.</li><li>Tap an exercise name for cues, the top mistake and progression.</li><li>Start with Week 0 to find your loads, then follow Weeks 1-12.</li><li>Log body weight and weekly check-ins in the Log tab.</li></ul></div>`}
+<div class="card"><div class="nm">How it works</div><ul class="ul"><li>Check off a set to start the rest timer. Adjust it ±15 s and the change is remembered.</li><li>Every set has its own weight and reps. Lower a set if you need to.</li><li>Tap an exercise name for cues, the top mistake and progression.</li><li>Start with Week 0 to find your loads, then follow Weeks 1-12.</li><li>Log body weight and weekly check-ins in the Log tab.</li><li>Swipe left or right to move between sections.</li><li>Finish a workout to see how many Giant Pandas you lifted.</li></ul></div>`}
 function dn(w){return['A','B','C','D'].filter(d=>Object.keys(S.logs).some(k=>k.startsWith(w+'|'+d+'|')&&S.logs[k].some(s=>s.k))).length}
-function weeks(){return'<div class="note">Tap a week to open it.</div>'+Array.from({length:13},(_,w)=>{const p=ph(w);return`<div class="card ${w==S.wk?'cur':''}" onclick="S.wk=${w};sv();$('#wk').value=${w};go('wo')"><div class="h"><span class="cd">${w}</span><span class="nm">${p.nm}</span><span class="meta">${dn(w)}/4 sessions</span></div><div class="mu">${BL[p.nm]}${DSW.includes(w)?' Drop sets on.':''}${w==11?' Retest week.':''}</div></div>`}).join('')}
+function weeks(){return'<div class="note">Tap a week to open it.</div>'+Array.from({length:13},(_,w)=>{const p=ph(w);return`<div class="card ${w==S.wk?'cur':''}" onclick="S.wk=${w};sv();$('#wk').value=${w};go('wo')"><div class="h"><span class="cd">${w}</span><span class="nm">${p.nm}</span><span class="meta">${dn(w)}/4 sessions</span></div><div class="mu">${BL[p.nm]}${DSW.includes(w)?' Drop sets on.':''}${w==11?' Retest week.':''}</div>${pbtn(w)}</div>`}).join('')}
 function sess(){const m={};Object.keys(S.logs).forEach(k=>{const a=k.split('|'),n=S.logs[k].filter(x=>x.k).length;if(n)m[a[0]+'|'+a[1]]=(m[a[0]+'|'+a[1]]||0)+n});return Object.keys(m).sort((a,b)=>{const x=a.split('|'),y=b.split('|');return y[0]-x[0]||y[1].localeCompare(x[1])}).slice(0,8).map(q=>{const a=q.split('|');return`<div class="mu">Wk ${a[0]} · ${DAYS[a[1]].n} ${DAYS[a[1]].t}: ${m[q]} sets checked</div>`}).join('')||'<div class="mu">No sessions yet.</div>'}
 function logv(w){const B=S.bw,td=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10),c=S.ci[w]||{},f=(k,l)=>`<div><label>${l}</label><input inputmode="decimal" value="${c[k]||''}" onchange="ci(${w},'${k}',this.value)"></div>`;
 const tr=B.length>1?`<div class="hint">Latest ${B[B.length-1].v} lb · ${(B[B.length-1].v-B[0].v>=0?'+':'')+(B[B.length-1].v-B[0].v).toFixed(1)} lb since ${B[0].d}</div>`:'';
 const ch=Object.keys(S.ci).sort((a,b)=>a-b).map(k=>`<div class="mu">Wk ${k}: waist ${S.ci[k].wa||'–'} · RHR ${S.ci[k].hr||'–'} · shoulder ${S.ci[k].sh||'–'}/10${S.ci[k].nt?' · '+S.ci[k].nt:''}</div>`).join('');
 return`<div class="card"><div class="nm">Body weight</div><div class="row2"><div><label>Weight (lb)</label><input id="bwv" inputmode="decimal"></div><div><label>Date</label><input id="bwd" type="date" value="${td}"></div></div><button class="btn" style="margin-top:8px" onclick="addbw()">Save weight</button>${tr}${B.slice(-8).reverse().map(x=>`<div class="mu">${x.d} · ${x.v} lb <span onclick="delbw('${x.d}')" style="float:right;color:var(--dr)">✕</span></div>`).join('')}</div>
 <div class="card"><div class="nm">Week ${w} check-in</div><div class="row2">${f('wa','Waist (in)')}${f('hr','Resting HR')}${f('sh','Shoulder 0-10')}</div><label>Notes (sleep, soreness, energy)</label><textarea style="width:100%" rows="2" onchange="ci(${w},'nt',this.value)">${c.nt||''}</textarea>${ch}</div>
-<div class="card"><div class="nm">Recent sessions</div>${sess()}</div>`}
+${pandaCard()}<div class="card"><div class="nm">Recent sessions</div>${sess()}</div>`}
 function addbw(){const x=parseFloat($('#bwv').value),d=$('#bwd').value;if(!x||!d)return;S.bw=S.bw.filter(y=>y.d!=d);S.bw.push({d,v:x});S.bw.sort((a,b)=>a.d.localeCompare(b.d));sv();render()}
 function delbw(d){S.bw=S.bw.filter(y=>y.d!=d);sv();render()}
 function guide(){return`<div class="card"><div class="nm">Rest</div><div class="mu">60 s after heavy lifts, 45 s moderate, 30 s isolation, TRX and core. Adjust the timer ±15 s when needed.</div></div>
@@ -149,7 +163,7 @@ function guide(){return`<div class="card"><div class="nm">Rest</div><div class="
 <div class="card"><div class="nm">Short on time</div><div class="mu">Skip in this order: optional work, the Thursday finisher, then shorten the ab block. Tired week? Cut Thursday’s TRX chest fly, optional pairs, then one set from each isolation exercise.</div></div>
 <div class="card"><div class="nm">Backup</div><div class="mu">Data is stored on this phone only. Export regularly.</div><button class="btn" style="margin-top:8px" onclick="exp()">Export</button> <label class="btn" style="display:inline-block">Import<input type="file" accept=".json" hidden onchange="imp(this.files[0])"></label></div>`}
 function ci(w,k,v){(S.ci[w]=S.ci[w]||{})[k]=v;sv()}
-function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='cadence-backup.json';a.click()}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='forge-backup.json';a.click()}
 function imp(f){const r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);sv();render()}catch(e){alert('Invalid file')}};r.readAsText(f)}
 $('#wk').innerHTML=Array.from({length:13},(_,i)=>`<option value="${i}">Week ${i}${i==0?' (calibrate)':''}</option>`).join('');$('#wk').value=S.wk;$('#wk').onchange=e=>{S.wk=+e.target.value;sv();render()};
 render();if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');
