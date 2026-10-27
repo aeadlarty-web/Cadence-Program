@@ -21,9 +21,10 @@ main{padding:10px 12px}.ph{color:var(--mu);font-size:13px;margin:4px 0 10px}.ph 
 label{display:block;color:var(--mu);font-size:13px;margin:8px 0 3px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--c);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom);z-index:10}nav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0 6px;font-size:11px}nav button span{display:block;font-size:20px}nav .on{color:var(--ac)}.cur{border-color:var(--ac)}.ul{margin:6px 0 0;padding-left:18px;color:var(--mu);font-size:13.5px}.ul li{margin:3px 0}.mu{color:var(--mu);font-size:13.5px}
 @keyframes slL{from{transform:translateX(40px);opacity:.3}to{transform:none;opacity:1}}@keyframes slR{from{transform:translateX(-40px);opacity:.3}to{transform:none;opacity:1}}
+#st{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;align-items:center;justify-content:center;text-align:center;padding:20px}.stc{width:100%;max-width:420px}.go{width:180px;height:180px;border-radius:50%;background:var(--ac);color:#04201c;border:0;font-size:36px;font-weight:800;margin:18px auto;display:block}.bigt{font-size:84px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ac);margin:10px 0}
 </style></head><body>
 <header><div class="top"><h1>FORGE</h1><select id="wk"></select></div><div class="tabs" id="tabs"></div></header>
-<main id="app"></main><nav id="nav"></nav><div id="tm"></div><div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div id="sb"></div></div>
+<main id="app"></main><nav id="nav"></nav><div id="tm"></div><div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div id="sb"></div></div><div id="st"></div>
 <script>
 // [code,name,sets F,B,P,reps,tempo,cat,flags(o=optional,d=drop-set exercise),swap[fromWeek,name,reps,tempo]]
 const DAYS={
@@ -119,7 +120,7 @@ L.forEach((s,i)=>{const pl=ls&&ls[i]?ls[i]:{};h+=`<div class="set ${s.d?'d':''}"
 if(e.ds&&DSW.includes(w))h+=`<button class="btn dr" onclick="drop('${k}')">+ Drop set</button>`;
 h+=`${hint?`<div class="hint">${hint}</div>`:''}</div>`});
 if(D.fin&&!p.rs)h+=`<div class="card op"><span class="tag">OPTIONAL FINISHER</span><div class="meta">5 min non-stop: 10 TRX squats + 10 mountain climbers, repeat. Skip first when short on time.</div></div>`;
-h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div><div class="note"><b>Notes</b><br>${DSW.includes(w)?'* Drop-set exercise this week: after your last working set, lower the weight about 20% and keep going to near failure with no rest. Tap + Drop set to log it, and tap the ✕ on a drop row to remove it.<br>':''}RIR = reps left in the tank.<br>Tempo = lowering, bottom pause, lifting, top hold (seconds).<br>OPTIONAL = skip first when short on time.<br>Reset and Deload weeks have fewer sets and no drop sets.</div><button class="btn" style="width:100%;padding:12px" onclick="finish(tab)">Finish workout 🐼</button>`}
+h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div><div class="note"><b>Notes</b><br>${DSW.includes(w)?'* Drop-set exercise this week: after your last working set, lower the weight about 20% and keep going to near failure with no rest. Tap + Drop set to log it, and tap the ✕ on a drop row to remove it.<br>':''}RIR = reps left in the tank.<br>Tempo = lowering, bottom pause, lifting, top hold (seconds).<br>OPTIONAL = skip first when short on time.<br>Reset and Deload weeks have fewer sets and no drop sets.</div><button class="btn" style="width:100%;padding:12px" onclick="coolAsk(tab)">Finish workout 🐼</button>`}
 return h}
 const PW=330,PM={'Incline DB Press':[2,1],'DB Bench Press':[2,1],'DB Lateral Raise':[2,1],'Hammer Curl':[2,1],'Incline DB Curl':[2,1],'DB Front Squat (racked)':[2,1],'DB Romanian Deadlift':[2,1],'Standing DB Overhead Press':[2,1],'DB Skull Crusher':[1,1],'DB Hip Thrust':[1,1],'One-Arm DB Row':[1,2],'Single-Leg Calf Raise (DB)':[1,2],'Bulgarian Split Squat':[2,2],'DB Reverse Lunge':[2,2],'Weighted Dips (belt)':'B','Weighted Pull-ups (belt)':'B','Weighted Chin-ups (belt)':'B'};
 const pd=t=>(t/PW).toFixed(1),fm=t=>Math.round(t).toLocaleString(),show=h=>{$('#sb').innerHTML=h;$('#sheet').style.display='flex'},cl=`<button class="btn" style="margin-top:14px" onclick="$('#sheet').style.display='none'">Close</button>`;
@@ -131,9 +132,36 @@ function finish(d,auto){const w=S.wk,a=vol(w,d),k=wvol(w);show(`<h3>🐼 ${auto?
 function weekRep(w){show(weekHtml(wvol(w),w)+cl)}
 function pbtn(w){const t=wvol(w).t;return t?`<button class="btn" style="margin-top:8px" onclick="event.stopPropagation();weekRep(${w})">🐼 ${pd(t)} pandas · report</button>`:''}
 function pandaCard(){let all=0,rows='';for(let w=0;w<=12;w++){const t=wvol(w).t;all+=t;if(t)rows+=`<div class="mu" style="padding:3px 0" onclick="weekRep(${w})">Week ${w}: ${fm(t)} lb · ${pd(t)} 🐼 ›</div>`}return`<div class="card"><div class="nm">🐼 Panda report</div><div class="mu">All-time: ${fm(all)} lb · ${pd(all)} Giant Pandas (330 lb each)</div>${rows||'<div class="mu">Finish a workout to start counting.</div>'}<div class="mu" style="margin-top:6px;font-size:12px">Estimate: belt lifts include your latest logged body weight. TRX, bands and core are not counted.</div></div>`}
+const SX={chest:['TRX Chest Opener',30,0,'Face away from the anchor, arms wide on the handles, lean forward to a mild chest stretch. No TRX: doorway chest stretch.'],
+lat:['TRX Lat Stretch',30,0,'Face the anchor, arms overhead on the handles, sit hips back and drop your chest. No TRX: kneel with hands on a bench.'],
+tri:['Overhead Triceps Stretch',20,1,'Hand behind your head, gently press the elbow with your other hand.'],
+sh:['Cross-Body Shoulder Stretch',20,1,'Pull one arm across your chest, keeping the shoulder down.'],
+bi:['Biceps & Forearm Wall Stretch',20,1,'Palm flat on a wall, fingers back, slowly turn your body away.'],
+ham:['TRX Hamstring Stretch',20,1,'Lie on your back, one heel in the cradle, leg straight up. No TRX: use a towel or band.'],
+hip:['TRX Hip Flexor Stretch',20,1,'Back foot in the cradle, front foot forward in a lunge, tuck your pelvis. No TRX: kneeling lunge.'],
+fig:['TRX Figure-4 Glute Stretch',20,1,'Hold the handles, cross one ankle over the opposite knee and sit back. No TRX: lie on your back.'],
+quad:['Standing Quad Stretch',20,1,'Hold a TRX handle for balance, heel toward glute, knees together.'],
+calf:['Wall Calf Stretch',15,1,'Hands on a wall, back leg straight, heel down.'],
+hug:['Upper-Back Hug Stretch',30,0,'Hug yourself, round your upper back and reach forward.']};
+const RT={A:['chest','lat','tri','sh','bi'],D:['chest','lat','tri','sh','bi'],B:['ham','hip','fig','quad','calf'],C:['chest','hip','ham','lat','hug']};
+let X={};
+function coolAsk(d){show(`<h3>🧘 Cool-down</h3><div class="mu">Stretch for about 3 minutes?</div><button class="btn" style="margin-top:12px" onclick="$('#sheet').style.display='none';cool('${d}')">Start stretch</button> <button class="btn" onclick="$('#sheet').style.display='none';finish('${d}')">Skip</button>`)}
+function cool(d){stop();AC=AC||new(window.AudioContext||window.webkitAudioContext)();X={d,i:0,run:0};stDraw()}
+function stDraw(){const L=RT[X.d],s=SX[L[X.i]],n=L.length,per=s[2];let b;
+if(X.run)b=`<div class="mu">${s[0]}</div><div class="bigt" id="stt">0:00</div><div class="mu">${per?(X.side?'Switch sides! Side 2 of 2':'Side 1 of 2'):'Hold'}</div><div class="row2" style="margin-top:14px"><button class="btn" onclick="stPause()">${X.paused?'Resume':'Pause'}</button><button class="btn" onclick="stNext(1)">Skip</button></div>`;
+else b=`<div class="mu">Stretch ${X.i+1} of ${n}</div><h2 style="color:var(--ac);margin:6px 0">${s[0]}</h2><div class="mu">${s[3]}</div><div class="meta">${s[1]} s${per?' per side':''} · mild tension, never pain</div><button class="go" onclick="stGo()">GO</button><div class="mu">${X.i<n-1?'Next: '+SX[L[X.i+1]][0]:'Last stretch'}</div><div class="row2" style="margin-top:12px"><button class="btn" onclick="stNext(-1)">Back</button><button class="btn" onclick="stNext(1)">Skip</button></div>`;
+const o=$('#st');o.style.display='flex';o.innerHTML=`<div class="stc">${b}<button class="btn" style="margin-top:18px" onclick="stEnd()">End stretch</button></div>`;if(X.run)stTick(1)}
+function stGo(){X.run=1;X.side=0;X.paused=0;AC=AC||new(window.AudioContext||window.webkitAudioContext)();wl();stStart()}
+function stStart(){clearInterval(X.iv);X.end=Date.now()+SX[RT[X.d][X.i]][1]*1000;X.iv=setInterval(stTick,250);stDraw()}
+function stTick(q){if(!X.run)return;const s=SX[RT[X.d][X.i]],r=X.paused?X.rem:Math.ceil((X.end-Date.now())/1000);
+if(r<=0&&!q){clearInterval(X.iv);beep();if(s[2]&&!X.side){X.side=1;stStart()}else stNext(1);return}
+const e=$('#stt');if(e){const v=Math.max(0,r);e.textContent=Math.floor(v/60)+':'+String(v%60).padStart(2,'0')}}
+function stPause(){if(X.paused){X.paused=0;X.end=Date.now()+X.rem*1000;X.iv=setInterval(stTick,250)}else{X.rem=Math.ceil((X.end-Date.now())/1000);clearInterval(X.iv);X.paused=1}stDraw()}
+function stNext(k){clearInterval(X.iv);X.run=0;X.paused=0;X.i=Math.max(0,X.i+k);if(X.i>=RT[X.d].length)stEnd();else stDraw()}
+function stEnd(){clearInterval(X.iv);$('#st').style.display='none';finish(X.d)}
 function inp(k,i,f,v){S.logs[k][i][f]=v;sv()}
 function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];s.k=s.k?0:1;
-if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y);if(s.k&&tab!='W'&&!S.pr[S.wk+'|'+tab]&&reqDone(S.wk,tab)){S.pr[S.wk+'|'+tab]=1;sv();finish(tab,1)}}
+if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y);if(s.k&&tab!='W'&&!S.pr[S.wk+'|'+tab]&&reqDone(S.wk,tab)){S.pr[S.wk+'|'+tab]=1;sv();coolAsk(tab)}}
 function deldrop(k,i){S.logs[k].splice(i,1);sv();const y=scrollY;render();scrollTo(0,y)}
 function drop(k){S.logs[k].push({w:'',r:'',k:0,d:1});sv();const y=scrollY;render();scrollTo(0,y)}
 let AC,T={},WL;async function wl(){try{WL=await navigator.wakeLock.request('screen')}catch(e){}}
@@ -147,7 +175,7 @@ function info(n){const x=(I[n]||'No card yet|| ').split('|'),c=x[0].split(';');$
 const NV=[['home','🏠','Home'],['wo','🏋️','Workout'],['wk','📅','Weeks'],['log','📈','Log'],['guide','ℹ️','Guide']];let v='home';
 function go(k,d){v=k;scrollTo(0,0);render();if(d){const a=$('#app');a.style.animation='none';a.offsetWidth;a.style.animation=(d>0?'slL':'slR')+' .2s ease-out'}}
 const ORD=['home','wo','wk','log','guide'];let tx=0,ty=0,tg=null;
-document.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;tg=e.target.closest('input,textarea,select,#sheet,#tm')},{passive:true});
+document.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;tg=e.target.closest('input,textarea,select,#sheet,#tm,#st')},{passive:true});
 document.addEventListener('touchend',e=>{if(tg||$('#sheet').style.display=='flex')return;const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6){const i=ORD.indexOf(v)+(dx<0?1:-1);if(i>=0&&i<ORD.length)go(ORD[i],dx<0?1:-1)}},{passive:true});
 function render(){$('#nav').innerHTML=NV.map(x=>`<button class="${v==x[0]?'on':''}" onclick="go('${x[0]}')"><span>${x[1]}</span>${x[2]}</button>`).join('');const t=$('#tabs');t.style.display=v=='wo'?'flex':'none';if(v!='wo')t.innerHTML='';$('#wk').style.display=(v=='wo'||v=='home')?'':'none';$('#app').innerHTML=({home,wk:weeks,log:logv,guide,wo:workout})[v]()}
 function home(){const w=S.wk,p=ph(w),td={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow];
@@ -171,6 +199,7 @@ function guide(){return`<div class="card"><div class="nm">Rest</div><div class="
 <div class="card"><div class="nm">Drop sets (*)</div><div class="mu">Only on the exercises marked * in Weeks 6-7 and 9-11. After your last working set, lower the weight about 20% and continue to near failure with no rest. Log it with + Drop set; tap ✕ to remove one added by mistake.</div></div>
 <div class="card"><div class="nm">Progression</div><div class="mu">Add the smallest weight jump when every set reaches the top of the rep range at the target RIR. After you finish an exercise, the app shows a tip: add weight, stay at this weight, or repeat and lower it if you fall below the range. If weights are maxed: slow the lowering, add a pause, go single-limb, or add band tension.</div></div>
 <div class="card"><div class="nm">Phases</div><ul class="ul"><li>Week 0: calibrate loads, no failure</li><li>Weeks 1-3: Foundation</li><li>Week 4: Reset (one fewer set)</li><li>Weeks 5-7: Build (drop sets from Week 6)</li><li>Week 8: Reset</li><li>Weeks 9-11: Peak (Week 11 retest)</li><li>Week 12: Deload</li></ul></div>
+<div class="card"><div class="nm">Cool-down stretch</div><div class="mu">After your last exercise, tap Finish workout and then Start stretch (about 3 min). Tap GO for each stretch. Side stretches beep to switch sides. Stretch to mild tension, never pain. TRX stretches have a no-TRX alternative in the cue.</div></div>
 <div class="card"><div class="nm">Short on time</div><div class="mu">Skip in this order: optional work, the Thursday finisher, then shorten the ab block. Tired week? Cut Thursday’s TRX chest fly, optional pairs, then one set from each isolation exercise.</div></div>
 <div class="card"><div class="nm">Backup</div><div class="mu">Data is stored on this phone only. Export regularly.</div><button class="btn" style="margin-top:8px" onclick="exp()">Export</button> <label class="btn" style="display:inline-block">Import<input type="file" accept=".json" hidden onchange="imp(this.files[0])"></label></div>`}
 function ci(w,k,v){(S.ci[w]=S.ci[w]||{})[k]=v;sv()}
