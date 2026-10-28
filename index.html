@@ -88,7 +88,7 @@ const I={ // cues;cues|mistake→fix|progression
 'Band Lateral Raise':'Stand on the band;Lead with elbows;Hold top 1 s|Shrugging → lighter band|Heavier band; note band color',
 'Band Face Pull':'Elbows high;Pull to forehead;Rotate hands out|Pulling to chest → pull higher|Heavier band'};
 const DSW=[6,7,9,10,11],$=s=>document.querySelector(s);
-let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];S.pr=S.pr||{};if(S.wk==null)S.wk=0;
+let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];S.pr=S.pr||{};S.fin=S.fin||{};if(S.wk==null)S.wk=0;
 const sv=()=>localStorage.setItem('cad',JSON.stringify(S));
 const dow=new Date().getDay();let tab={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow]||'A';
 function ph(w){const rs=[4,8,12].includes(w),i=w>=9&&w<=11?2:w>=5&&w<=8?1:0;return{rs,i,k:w==12?'D':rs?'R':'FBP'[i],nm:w==0?'Calibration':w==12?'Deload':rs?'Reset':['Foundation','Build','Peak'][i]}}
@@ -119,7 +119,7 @@ h+=`<div class="card ${e.o?'op':''}"><div class="h"><span class="cd">${e.c}</spa
 L.forEach((s,i)=>{const pl=ls&&ls[i]?ls[i]:{};h+=`<div class="set ${s.d?'d':''}"><span ${s.d?`onclick="deldrop('${k}',${i})"`:''}>${s.d?'✕':i+1}</span><input inputmode="decimal" placeholder="${pl.w||'lb'}" value="${s.w}" onchange="inp('${k}',${i},'w',this.value)"><input inputmode="numeric" placeholder="${pl.r||'reps'}" value="${s.r}" onchange="inp('${k}',${i},'r',this.value)"><button class="ck ${s.k?'on':''}" onclick="chk('${k}',${i},'${e.n.replace(/'/g,"\\'")}',${rs})">✓</button></div>`});
 if(e.ds&&DSW.includes(w))h+=`<button class="btn dr" onclick="drop('${k}')">+ Drop set</button>`;
 h+=`${hint?`<div class="hint">${hint}</div>`:''}</div>`});
-if(D.fin&&!p.rs)h+=`<div class="card op"><span class="tag">OPTIONAL FINISHER</span><div class="meta">5 min non-stop: 10 TRX squats + 10 mountain climbers, repeat. Skip first when short on time.</div></div>`;
+if(D.fin&&!p.rs)h+=`<div class="card op"><span class="tag">OPTIONAL FINISHER</span><div class="meta">5 min non-stop: 10 TRX squats + 10 mountain climbers, repeat. A tick sounds each minute. Skip first when short on time.</div><div class="set" style="grid-template-columns:1fr 46px"><button class="btn" onclick="finGo()">Start 5:00</button><button class="ck ${S.fin[w]?'on':''}" onclick="finChk()">✓</button></div></div>`;
 h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div><div class="note"><b>Notes</b><br>${DSW.includes(w)?'* Drop-set exercise this week: after your last working set, lower the weight about 20% and keep going to near failure with no rest. Tap + Drop set to log it, and tap the ✕ on a drop row to remove it.<br>':''}RIR = reps left in the tank.<br>Tempo = lowering, bottom pause, lifting, top hold (seconds).<br>OPTIONAL = skip first when short on time.<br>Reset and Deload weeks have fewer sets and no drop sets.</div><button class="btn" style="width:100%;padding:12px" onclick="coolAsk(tab)">Finish workout 🐼</button>`}
 return h}
 const PW=330,PM={'Incline DB Press':[2,1],'DB Bench Press':[2,1],'DB Lateral Raise':[2,1],'Hammer Curl':[2,1],'Incline DB Curl':[2,1],'DB Front Squat (racked)':[2,1],'DB Romanian Deadlift':[2,1],'Standing DB Overhead Press':[2,1],'DB Skull Crusher':[1,1],'DB Hip Thrust':[1,1],'One-Arm DB Row':[1,2],'Single-Leg Calf Raise (DB)':[1,2],'Bulgarian Split Squat':[2,2],'DB Reverse Lunge':[2,2],'Weighted Dips (belt)':'B','Weighted Pull-ups (belt)':'B','Weighted Chin-ups (belt)':'B'};
@@ -159,13 +159,23 @@ const e=$('#stt');if(e){const v=Math.max(0,r);e.textContent=Math.floor(v/60)+':'
 function stPause(){if(X.paused){X.paused=0;X.end=Date.now()+X.rem*1000;X.iv=setInterval(stTick,250)}else{X.rem=Math.ceil((X.end-Date.now())/1000);clearInterval(X.iv);X.paused=1}stDraw()}
 function stNext(k){clearInterval(X.iv);X.run=0;X.paused=0;X.i=Math.max(0,X.i+k);if(X.i>=RT[X.d].length)stEnd();else stDraw()}
 function stEnd(){clearInterval(X.iv);$('#st').style.display='none';finish(X.d)}
+let F={};
+function tk(){try{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.frequency.value=660;g.gain.setValueAtTime(.25,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.15);o.start();o.stop(AC.currentTime+.16)}catch(e){}navigator.vibrate&&navigator.vibrate(100)}
+function finChk(){S.fin[S.wk]=S.fin[S.wk]?0:1;sv();const y=scrollY;render();scrollTo(0,y)}
+function finGo(){stop();clearInterval(F.iv);AC=AC||new(window.AudioContext||window.webkitAudioContext)();wl();F={end:Date.now()+300000,m:5,p:0};$('#tm').style.display='flex';F.iv=setInterval(finTick,250);finTick()}
+function finTick(){const r=F.p?F.rem:Math.ceil((F.end-Date.now())/1000),m=$('#tm'),v=Math.max(0,r);
+if(r<=0&&!F.p){clearInterval(F.iv);beep();S.fin[S.wk]=1;sv();m.className='go';m.innerHTML='<div class="t">Done ✓<small>Finisher complete</small></div><button class="btn" onclick="finStop()">Close</button>';const y=scrollY;render();scrollTo(0,y);return}
+const mn=Math.ceil(v/60);if(!F.p&&mn<F.m){F.m=mn;tk()}
+m.className='';m.innerHTML=`<div class="t">${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}<small>Finisher · minute ${6-mn} of 5</small></div><button class="btn" onclick="finPause()">${F.p?'Resume':'Pause'}</button><button class="btn" onclick="finStop()">Stop</button>`}
+function finPause(){if(F.p){F.p=0;F.end=Date.now()+F.rem*1000;F.iv=setInterval(finTick,250)}else{F.rem=Math.ceil((F.end-Date.now())/1000);clearInterval(F.iv);F.p=1}finTick()}
+function finStop(){clearInterval(F.iv);$('#tm').style.display='none';$('#tm').className=''}
 function inp(k,i,f,v){S.logs[k][i][f]=v;sv()}
 function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];s.k=s.k?0:1;
 if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y);if(s.k&&tab!='W'&&!S.pr[S.wk+'|'+tab]&&reqDone(S.wk,tab)){S.pr[S.wk+'|'+tab]=1;sv();coolAsk(tab)}}
 function deldrop(k,i){S.logs[k].splice(i,1);sv();const y=scrollY;render();scrollTo(0,y)}
 function drop(k){S.logs[k].push({w:'',r:'',k:0,d:1});sv();const y=scrollY;render();scrollTo(0,y)}
 let AC,T={},WL;async function wl(){try{WL=await navigator.wakeLock.request('screen')}catch(e){}}
-function start(sec,n){clearInterval(T.iv);T={n,b:sec,end:Date.now()+sec*1000};$('#tm').style.display='flex';$('#tm').className='';T.iv=setInterval(tick,250);tick()}
+function start(sec,n){clearInterval(F.iv);clearInterval(T.iv);T={n,b:sec,end:Date.now()+sec*1000};$('#tm').style.display='flex';$('#tm').className='';T.iv=setInterval(tick,250);tick()}
 function tick(){const r=Math.ceil((T.end-Date.now())/1000),m=$('#tm');if(r<=0&&m.className!='go'){m.className='go';beep();setTimeout(()=>{if(m.className=='go')stop()},6000)}
 const v=Math.max(0,r);m.innerHTML=`<div class="t">${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}<small>${m.className=='go'?'GO – next set':T.n}</small></div><button class="btn" onclick="adj(-15)">−15</button><button class="btn" onclick="adj(15)">+15</button><button class="btn" onclick="stop()">Skip</button>`}
 function adj(d){T.end+=d*1000;T.b=Math.max(15,T.b+d);S.rest[T.n]=T.b;sv();$('#tm').className='';tick()}
