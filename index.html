@@ -112,7 +112,7 @@ function workout(){const w=S.wk,p=ph(w);
 $('#tabs').innerHTML=['A','B','W','C','D'].map(t=>`<button class="${t==tab?'on':''}" onclick="tab='${t}';render()">${t=='W'?'Wed':DAYS[t].n}</button>`).join('');
 let h=`<div class="ph"><b>Week ${w} · ${p.nm}</b> · ${BL[p.nm]}${DSW.includes(w)?' Drop sets (+) on marked lifts.':''}${w==11?' Week 11 is your retest week: log best sets.':''}</div>`;
 if(tab=='W')h+=`<div class="card"><div class="nm">Peloton HIIT</div><div class="meta">${pel(w)}</div></div><div class="note">A mid-week break from lifting. If lifts feel grindy, use the Week 4 ride.</div>`;
-else{const D=DAYS[tab];h+=`<div class="note"><b>${D.t}</b><br>${D.w}</div>`;
+else{const D=DAYS[tab];h+=`<div class="note"><b>${D.t}</b><br>${D.w}</div>`;h+=abCard(w);
 D.r.forEach(r=>{const e=ex(r,w),k=key(w,tab,e.n),L=lg(k,e.s),ls=last(w,tab,e.n),top=parseInt(e.reps.split('-')[1]),rs=S.rest[e.n]||REST[e.cat],ws=L.filter(s=>!s.d);
 let hint=tip(e,ws,ls);
 h+=`<div class="card ${e.o?'op':''}"><div class="h"><span class="cd">${e.c}</span><span class="nm" onclick="info('${e.n.replace(/'/g,"\\'")}')">${e.n}${e.ds&&DSW.includes(w)?'*':''} ⓘ</span>${e.o?'<span class="tag">OPTIONAL</span>':''}</div><div class="meta">${e.s} × ${e.reps} · tempo ${e.t} · rest ${rs}s · RIR ${e.rir}</div>${ls?`<div class="last">Last: ${ls.map(s=>(s.w||'–')+'×'+(s.r||'–')).join(', ')}</div>`:''}`;
@@ -146,19 +146,19 @@ hug:['Upper-Back Hug Stretch',30,0,'Hug yourself, round your upper back and reac
 const RT={A:['chest','lat','tri','sh','bi'],D:['chest','lat','tri','sh','bi'],B:['ham','hip','fig','quad','calf'],C:['chest','hip','ham','lat','hug']};
 let X={};
 function coolAsk(d){show(`<h3>🧘 Cool-down</h3><div class="mu">Stretch for about 3 minutes?</div><button class="btn" style="margin-top:12px" onclick="$('#sheet').style.display='none';cool('${d}')">Start stretch</button> <button class="btn" onclick="$('#sheet').style.display='none';finish('${d}')">Skip</button>`)}
-function cool(d){stop();AC=AC||new(window.AudioContext||window.webkitAudioContext)();X={d,i:0,run:0};stDraw()}
-function stDraw(){const L=RT[X.d],s=SX[L[X.i]],n=L.length,per=s[2];let b;
-if(X.run)b=`<div class="mu">${s[0]}</div><div class="bigt" id="stt">0:00</div><div class="mu">${per?(X.side?'Switch sides! Side 2 of 2':'Side 1 of 2'):'Hold'}</div><div class="row2" style="margin-top:14px"><button class="btn" onclick="stPause()">${X.paused?'Resume':'Pause'}</button><button class="btn" onclick="stNext(1)">Skip</button></div>`;
-else b=`<div class="mu">Stretch ${X.i+1} of ${n}</div><h2 style="color:var(--ac);margin:6px 0">${s[0]}</h2><div class="mu">${s[3]}</div><div class="meta">${s[1]} s${per?' per side':''} · mild tension, never pain</div><button class="go" onclick="stGo()">GO</button><div class="mu">${X.i<n-1?'Next: '+SX[L[X.i+1]][0]:'Last stretch'}</div><div class="row2" style="margin-top:12px"><button class="btn" onclick="stNext(-1)">Back</button><button class="btn" onclick="stNext(1)">Skip</button></div>`;
-const o=$('#st');o.style.display='flex';o.innerHTML=`<div class="stc">${b}<button class="btn" style="margin-top:18px" onclick="stEnd()">End stretch</button></div>`;if(X.run)stTick(1)}
+function cool(d){stop();AC=AC||new(window.AudioContext||window.webkitAudioContext)();X={d,i:0,run:0,L:RT[d]};stDraw()}
+function stDraw(){const L=X.L,s=SX[L[X.i]],n=L.length,per=s[2];let b;
+if(X.run)b=`<div class="mu">${s[0]}</div><div class="bigt" id="stt">0:00</div><div class="mu">${per?(X.side?'Switch sides! Side 2 of 2':'Side 1 of 2'):(X.ab?'Go!':'Hold')}</div><div class="row2" style="margin-top:14px"><button class="btn" onclick="stPause()">${X.paused?'Resume':'Pause'}</button><button class="btn" onclick="stNext(1)">Skip</button></div>`;
+else b=`<div class="mu">${X.ab?'Exercise':'Stretch'} ${X.i+1} of ${n}</div><h2 style="color:var(--ac);margin:6px 0">${s[0]}</h2><div class="mu">${s[3]}</div><div class="meta">${s[1]} s${per?' per side':''}${X.ab?'':' · mild tension, never pain'}</div><button class="go" onclick="stGo()">GO</button><div class="mu">${X.i<n-1?'Next: '+SX[L[X.i+1]][0]:'Last stretch'}</div><div class="row2" style="margin-top:12px"><button class="btn" onclick="stNext(-1)">Back</button><button class="btn" onclick="stNext(1)">Skip</button></div>`;
+const o=$('#st');o.style.display='flex';o.innerHTML=`<div class="stc">${b}<button class="btn" style="margin-top:18px" onclick="stEnd()">${X.ab?'End ab block':'End stretch'}</button></div>`;if(X.run)stTick(1)}
 function stGo(){X.run=1;X.side=0;X.paused=0;AC=AC||new(window.AudioContext||window.webkitAudioContext)();wl();stStart()}
-function stStart(){clearInterval(X.iv);X.end=Date.now()+SX[RT[X.d][X.i]][1]*1000;X.iv=setInterval(stTick,250);stDraw()}
-function stTick(q){if(!X.run)return;const s=SX[RT[X.d][X.i]],r=X.paused?X.rem:Math.ceil((X.end-Date.now())/1000);
+function stStart(){clearInterval(X.iv);X.end=Date.now()+SX[X.L[X.i]][1]*1000;X.iv=setInterval(stTick,250);stDraw()}
+function stTick(q){if(!X.run)return;const s=SX[X.L[X.i]],r=X.paused?X.rem:Math.ceil((X.end-Date.now())/1000);
 if(r<=0&&!q){clearInterval(X.iv);beep();if(s[2]&&!X.side){X.side=1;stStart()}else stNext(1);return}
 const e=$('#stt');if(e){const v=Math.max(0,r);e.textContent=Math.floor(v/60)+':'+String(v%60).padStart(2,'0')}}
 function stPause(){if(X.paused){X.paused=0;X.end=Date.now()+X.rem*1000;X.iv=setInterval(stTick,250)}else{X.rem=Math.ceil((X.end-Date.now())/1000);clearInterval(X.iv);X.paused=1}stDraw()}
-function stNext(k){clearInterval(X.iv);X.run=0;X.paused=0;X.i=Math.max(0,X.i+k);if(X.i>=RT[X.d].length)stEnd();else stDraw()}
-function stEnd(){clearInterval(X.iv);$('#st').style.display='none';finish(X.d)}
+function stNext(k){clearInterval(X.iv);X.run=0;X.paused=0;X.i=Math.max(0,X.i+k);if(X.i>=X.L.length)stEnd();else stDraw()}
+function stEnd(){clearInterval(X.iv);$('#st').style.display='none';if(!X.ab)finish(X.d)}
 let F={};
 function tk(){try{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.frequency.value=660;g.gain.setValueAtTime(.25,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.15);o.start();o.stop(AC.currentTime+.16)}catch(e){}navigator.vibrate&&navigator.vibrate(100)}
 function finChk(){S.fin[S.wk]=S.fin[S.wk]?0:1;sv();const y=scrollY;render();scrollTo(0,y)}
@@ -169,6 +169,23 @@ const mn=Math.ceil(v/60);if(!F.p&&mn<F.m){F.m=mn;tk()}
 m.className='';m.innerHTML=`<div class="t">${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}<small>Finisher · minute ${6-mn} of 5</small></div><button class="btn" onclick="finPause()">${F.p?'Resume':'Pause'}</button><button class="btn" onclick="finStop()">Stop</button>`}
 function finPause(){if(F.p){F.p=0;F.end=Date.now()+F.rem*1000;F.iv=setInterval(finTick,250)}else{F.rem=Math.ceil((F.end-Date.now())/1000);clearInterval(F.iv);F.p=1}finTick()}
 function finStop(){clearInterval(F.iv);$('#tm').style.display='none';$('#tm').className=''}
+SX.a_hkr=['Hanging Knee Raise',60,0,'Hang from the bar and curl your knees to your chest by tilting the pelvis. No swinging.'];
+SX.a_db=['Dead Bug',60,0,'Lower the opposite arm and leg slowly, lower back flat on the floor.'];
+SX.a_fo=['TRX Fallout',60,0,'Ribs down, glutes tight. Move arms forward and overhead, pull back with the abs.'];
+SX.a_pl=['Plank',60,0,'Forearms down, straight line, glutes tight. Keep breathing.'];
+SX.a_rc=['Reverse Crunch',60,0,'Curl your hips off the floor slowly. No swinging the legs.'];
+SX.a_aw=['Ab Wheel Rollout',60,0,'Short range, ribs down, pull back with the abs.'];
+SX.a_bc=['Bicycle Crunch',60,0,'Slow. Rotate the ribs, not just the elbows, and extend the leg fully.'];
+SX.a_ls=['L-Sit (p-bars)',60,0,'Hold as long as you can with good form, tuck if needed. Rest and repeat until the timer ends.'];
+SX.a_sp=['Side Plank',30,1,'Elbow under shoulder, hips high, straight line.'];
+SX.a_mc=['Mountain Climbers',60,0,'Hands under shoulders, hips low, drive the knees fast.'];
+SX.a_kt=['TRX Knee Tuck',60,0,'Feet in the cradles, high plank, pull knees to chest, extend slowly.'];
+SX.a_hh=['Hollow Hold',60,0,'Lower back flat, arms overhead. Keep legs high enough to hold the back down; rest briefly if needed.'];
+SX.a_hlr=['Hanging Leg Raise',60,0,'Raise straight legs, curl the pelvis, lower slowly. Bend the knees if needed.'];
+const AB=[['a_hkr','a_db','a_fo','a_pl','a_rc'],['a_aw','a_bc','a_ls','a_sp','a_mc'],['a_kt','a_hh','a_hlr','a_rc','a_sp']];
+function abIdx(w){return w>0?(w-1)%3:0}
+function abCard(w){if(!['A','C','D'].includes(tab))return'';const i=abIdx(w);return`<div class="card op"><span class="tag">OPTIONAL AB BLOCK · 5 MIN</span><div class="meta">Circuit ${i+1} · 60 s each, nonstop</div><ul class="ul">${AB[i].map(k=>`<li>${SX[k][0]}${SX[k][2]?' (30 s per side)':''}</li>`).join('')}</ul><button class="btn" style="margin-top:8px" onclick="abGo()">Start ab block</button></div>`}
+function abGo(){stop();AC=AC||new(window.AudioContext||window.webkitAudioContext)();X={d:tab,i:0,run:0,L:AB[abIdx(S.wk)],ab:1};stDraw()}
 function inp(k,i,f,v){S.logs[k][i][f]=v;sv()}
 function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];s.k=s.k?0:1;
 if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y);if(s.k&&tab!='W'&&!S.pr[S.wk+'|'+tab]&&reqDone(S.wk,tab)){S.pr[S.wk+'|'+tab]=1;sv();coolAsk(tab)}}
