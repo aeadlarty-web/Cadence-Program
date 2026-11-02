@@ -22,6 +22,7 @@ label{display:block;color:var(--mu);font-size:13px;margin:8px 0 3px}.row2{displa
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--c);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom);z-index:10}nav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0 6px;font-size:11px}nav button span{display:block;font-size:20px}nav .on{color:var(--ac)}.cur{border-color:var(--ac)}.ul{margin:6px 0 0;padding-left:18px;color:var(--mu);font-size:13.5px}.ul li{margin:3px 0}.mu{color:var(--mu);font-size:13.5px}
 @keyframes slL{from{transform:translateX(40px);opacity:.3}to{transform:none;opacity:1}}@keyframes slR{from{transform:translateX(-40px);opacity:.3}to{transform:none;opacity:1}}
 #st{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;align-items:center;justify-content:center;text-align:center;padding:20px}.stc{width:100%;max-width:420px}.go{width:180px;height:180px;border-radius:50%;background:var(--ac);color:#04201c;border:0;font-size:36px;font-weight:800;margin:18px auto;display:block}.bigt{font-size:84px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ac);margin:10px 0}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px}.btn.on{background:var(--ac);color:#04201c;border-color:var(--ac)}
 </style></head><body>
 <header><div class="top"><h1>FORGE</h1><select id="wk"></select></div><div class="tabs" id="tabs"></div></header>
 <main id="app"></main><nav id="nav"></nav><div id="tm"></div><div id="sheet" onclick="if(event.target==this)this.style.display='none'"><div id="sb"></div></div><div id="st"></div>
@@ -88,7 +89,7 @@ const I={ // cues;cues|mistake→fix|progression
 'Band Lateral Raise':'Stand on the band;Lead with elbows;Hold top 1 s|Shrugging → lighter band|Heavier band; note band color',
 'Band Face Pull':'Elbows high;Pull to forehead;Rotate hands out|Pulling to chest → pull higher|Heavier band'};
 const DSW=[6,7,9,10,11],$=s=>document.querySelector(s);
-let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];S.pr=S.pr||{};S.fin=S.fin||{};S.wd=S.wd||{};S.an=S.an||{};S.anw=S.anw||{};if(S.wk==null)S.wk=0;
+let S=JSON.parse(localStorage.getItem('cad')||'{}');S.logs=S.logs||{};S.ci=S.ci||{};S.rest=S.rest||{};S.bw=S.bw||[];S.pr=S.pr||{};S.fin=S.fin||{};S.wd=S.wd||{};S.fl=S.fl||{};S.an=S.an||{};S.anw=S.anw||{};if(S.wk==null)S.wk=0;
 const sv=()=>localStorage.setItem('cad',JSON.stringify(S));
 const dow=new Date().getDay();let tab={1:'A',2:'B',3:'W',4:'C',5:'D'}[dow]||'A';
 function ph(w){const rs=[4,8,12].includes(w),i=w>=9&&w<=11?2:w>=5&&w<=8?1:0;return{rs,i,k:w==12?'D':rs?'R':'FBP'[i],nm:w==0?'Calibration':w==12?'Deload':rs?'Reset':['Foundation','Build','Peak'][i]}}
@@ -108,17 +109,38 @@ return`→ Stay at this weight. Aim for ${top} ${u} on every set.`}
 if(hi)return'✓ Top of range on every set. Make it harder: '+(n.startsWith('TRX')?'feet further forward or elevated, a slower lowering, or a pause.':n.startsWith('Band')?'a heavier band, stepping further from the anchor, or a pause.':'add weight, a slower lowering, or a pause.');
 if(lo)return'↓ A set fell below the range. Repeat this difficulty next time.';
 return`→ Stay at this difficulty. Aim for ${top} ${u} on every set.`}
+const SG={};
+const gU=x=>x<50?2.5:5,gD=x=>x<=50?2.5:5,rg=x=>x<=50?Math.round(x/2.5)*2.5:50+Math.round((x-50)/5)*5;
+function nxt(W,p,b){if(b)return W+2.5;let R=rg(W*(1+p));const m=W+gU(W);return R<m?m:R}
+function prv(W,p,b){let R=b?Math.round(W*(1-p)/2.5)*2.5:rg(W*(1-p));const m=W-gD(W);if(R>m)R=m;return Math.max(b?0:2.5,R)}
+function prevS(w,d,n){for(let x=w-1;x>=0;x--){if(ph(x).rs)continue;const a=S.logs[key(x,d,n)];if(a){const ws=a.filter(s=>!s.d&&s.k&&+s.r);if(ws.length)return{wk:x,ws,fl:S.fl[key(x,d,n)]}}}return null}
+function sug(e,w,d){if(ph(w).rs||!PM[e.n])return null;const s1=prevS(w,d,e.n);if(!s1)return null;
+const b=PM[e.n]=='B',iso=e.cat=='I',low=['DB Front Squat (racked)','DB Romanian Deadlift','Bulgarian Split Squat','DB Reverse Lunge','DB Hip Thrust','Single-Leg Calf Raise (DB)'].includes(e.n),top=parseInt(e.reps.split('-')[1]),bot=parseInt(e.reps);
+if(isNaN(top)||isNaN(bot))return null;const ws=s1.ws,W=+ws[0].w||0;if(!b&&!W)return null;const rs=ws.map(x=>+x.r),fl=s1.fl,s2=s1.wk>0?prevS(s1.wk,d,e.n):null;
+const bl=a=>a&&a.ws.some(x=>+x.r<bot),tp=a=>a&&a.ws.every(x=>+x.r>=top&&+x.w==+a.ws[0].w),dr=a=>a&&a.ws.some(x=>+x.w<+a.ws[0].w);
+let R=W,why='repeat this weight and add reps';
+if(s1.wk==0){why='calibration felt right';if(fl=='e'){R=b?W+2.5:W+gU(W);why='calibration felt easy'}else if(fl=='h'){R=prv(W,.05,b);why='calibration felt too hard'}}
+else{const pU=(low||iso)?.05:.035,big=rs.every(x=>x>=top+2)&&ws.every(x=>+x.w==W);
+if(rs[0]<=bot-3){R=prv(W,.10,b);why='first set well below the range'}
+else if(bl(s1)&&bl(s2)){R=prv(W,.05,b);why='below range two sessions in a row'}
+else if(dr(s1)&&dr(s2)){R=prv(W,.05,b);why='weight dropped two sessions in a row'}
+else if(tp(s1)&&(!iso||tp(s2))){R=nxt(W,big?pU*2:pU,b);why=big?'beat the top by 2+ reps':'top of range on every set'}
+else if(tp(s1)&&iso)why='top of range once; repeat it to earn an increase';
+if(fl=='e'){R=b?R+2.5:R+gU(R);why+=' + felt easy'}else if(fl=='h'){R=prv(R,0,b);why+=' + felt too hard'}}
+return{w:Math.max(0,R),d:Math.max(0,R)-W,b:W,why}}
+function sgNote(sg){if(!sg)return'';const sn=sg.d>0?'+':'';return`<div class="hint">Suggested: ${sg.w} lb ${sg.d==0?'(same)':'('+sn+sg.d+' lb'+(sg.b?', about '+sn+Math.round(sg.d/sg.b*100)+'%':'')+')'} · last time ${sg.b} · ${sg.why}</div>`}
+function felt(k,v){S.fl[k]=S.fl[k]==v?'':v;sv();const y=scrollY;render();scrollTo(0,y)}
 function workout(){const w=S.wk,p=ph(w);
 $('#tabs').innerHTML=['A','B','W','C','D'].map(t=>`<button class="${t==tab?'on':''}" onclick="tab='${t}';render()">${t=='W'?'Wed':DAYS[t].n}</button>`).join('');
 let h=`<div class="ph"><b>Week ${w} · ${p.nm}</b> · ${BL[p.nm]}${DSW.includes(w)?' Drop sets (+) on marked lifts.':''}${w==11?' Week 11 is your retest week: log best sets.':''}</div>`;
 if(tab=='W')h+=`<div class="card"><div class="nm">Peloton HIIT</div><div class="meta">${pel(w)}</div></div><div class="note">A mid-week break from lifting. If lifts feel grindy, use the Week 4 ride.</div>`;
 else{const D=DAYS[tab];h+=`<div class="note"><b>${D.t}</b><br>${D.w}</div>`;h+=abCard(w);
 D.r.forEach(r=>{const e=ex(r,w),k=key(w,tab,e.n),L=lg(k,e.s),ls=last(w,tab,e.n),top=parseInt(e.reps.split('-')[1]),rs=S.rest[e.n]||REST[e.cat],ws=L.filter(s=>!s.d);
-let hint=tip(e,ws,ls);
-h+=`<div class="card ${e.o?'op':''}"><div class="h"><span class="cd">${e.c}</span><span class="nm" onclick="info('${e.n.replace(/'/g,"\\'")}')">${e.n}${e.ds&&DSW.includes(w)?'*':''} ⓘ</span>${e.o?'<span class="tag">OPTIONAL</span>':''}</div><div class="meta">${e.s} × ${e.reps} · tempo ${e.t} · rest ${rs}s · RIR ${e.rir}</div>${ls?`<div class="last">Last: ${ls.map(s=>(s.w||'–')+'×'+(s.r||'–')).join(', ')}</div>`:''}`;
-L.forEach((s,i)=>{const pl=ls&&ls[i]?ls[i]:{};h+=`<div class="set ${s.d?'d':''}"><span ${s.d?`onclick="deldrop('${k}',${i})"`:''}>${s.d?'✕':i+1}</span><input inputmode="decimal" placeholder="${pl.w||'lb'}" value="${s.w}" onchange="inp('${k}',${i},'w',this.value)"><input inputmode="numeric" placeholder="${pl.r||'reps'}" value="${s.r}" onchange="inp('${k}',${i},'r',this.value)"><button class="ck ${s.k?'on':''}" onclick="chk('${k}',${i},'${e.n.replace(/'/g,"\\'")}',${rs})">✓</button></div>`});
+let hint=tip(e,ws,ls);const sg=sug(e,w,tab),sgn=sgNote(sg);if(sg)SG[k]=sg.w;else delete SG[k];const fel=(PM[e.n]&&ws.length&&ws.every(x=>x.k))?`<div class="meta" style="margin-top:8px">Last set felt:</div><div class="row3">${[['e','Easy'],['r','Right'],['h','Too hard']].map(f=>`<button class="btn ${S.fl[k]==f[0]?'on':''}" onclick="felt('${k}','${f[0]}')">${f[1]}</button>`).join('')}</div>`:'';
+h+=`<div class="card ${e.o?'op':''}"><div class="h"><span class="cd">${e.c}</span><span class="nm" onclick="info('${e.n.replace(/'/g,"\\'")}')">${e.n}${e.ds&&DSW.includes(w)?'*':''} ⓘ</span>${e.o?'<span class="tag">OPTIONAL</span>':''}</div><div class="meta">${e.s} × ${e.reps} · tempo ${e.t} · rest ${rs}s · RIR ${e.rir}</div>${sgn}${ls?`<div class="last">Last: ${ls.map(s=>(s.w||'–')+'×'+(s.r||'–')).join(', ')}</div>`:''}`;
+L.forEach((s,i)=>{const pl=ls&&ls[i]?ls[i]:{};h+=`<div class="set ${s.d?'d':''}"><span ${s.d?`onclick="deldrop('${k}',${i})"`:''}>${s.d?'✕':i+1}</span><input inputmode="decimal" placeholder="${pl.w||'lb'}" value="${s.w||(s.d?'':(SG[k]||''))}" onchange="inp('${k}',${i},'w',this.value)"><input inputmode="numeric" placeholder="${pl.r||'reps'}" value="${s.r}" onchange="inp('${k}',${i},'r',this.value)"><button class="ck ${s.k?'on':''}" onclick="chk('${k}',${i},'${e.n.replace(/'/g,"\\'")}',${rs})">✓</button></div>`});
 if(e.ds&&DSW.includes(w))h+=`<button class="btn dr" onclick="drop('${k}')">+ Drop set</button>`;
-h+=`${hint?`<div class="hint">${hint}</div>`:''}</div>`});
+h+=`${fel}${hint?`<div class="hint">${hint}</div>`:''}</div>`});
 if(D.fin&&!p.rs)h+=`<div class="card op"><span class="tag">OPTIONAL FINISHER</span><div class="meta">5 min non-stop: 10 TRX squats + 10 mountain climbers, repeat. A tick sounds each minute. Skip first when short on time.</div><div class="set" style="grid-template-columns:1fr 46px"><button class="btn" onclick="finGo()">Start 5:00</button><button class="ck ${S.fin[w]?'on':''}" onclick="finChk()">✓</button></div></div>`;
 h+=`<div class="note">Short on time? Skip optional work first, then the finisher, then shorten the ab block.</div><div class="note"><b>Notes</b><br>${DSW.includes(w)?'* Drop-set exercise this week: after your last working set, lower the weight about 20% and keep going to near failure with no rest. Tap + Drop set to log it, and tap the ✕ on a drop row to remove it.<br>':''}RIR = reps left in the tank.<br>Tempo = lowering, bottom pause, lifting, top hold (seconds).<br>OPTIONAL = skip first when short on time.<br>Reset and Deload weeks have fewer sets and no drop sets.</div><button class="btn" style="width:100%;padding:12px" onclick="coolAsk(tab)">Finish workout 🐼</button>`}
 return h}
@@ -194,7 +216,7 @@ function abIdx(w){return w>0?(w-1)%3:0}
 function abCard(w){if(!['A','C','D'].includes(tab))return'';const i=abIdx(w);return`<div class="card op"><span class="tag">OPTIONAL AB BLOCK · 5 MIN</span><div class="meta">Circuit ${i+1} · 60 s each, nonstop</div><ul class="ul">${AB[i].map(k=>`<li>${SX[k][0]}${SX[k][2]?' (30 s per side)':''}</li>`).join('')}</ul><button class="btn" style="margin-top:8px" onclick="abGo()">Start ab block</button></div>`}
 function abGo(){stop();AC=AC||new(window.AudioContext||window.webkitAudioContext)();X={d:tab,i:0,run:0,L:AB[abIdx(S.wk)],ab:1};stDraw()}
 function inp(k,i,f,v){S.logs[k][i][f]=v;sv()}
-function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];s.k=s.k?0:1;
+function chk(k,i,n,rs){AC=AC||new(window.AudioContext||window.webkitAudioContext)();const s=S.logs[k][i];if(!s.w&&!s.d&&SG[k])s.w=String(SG[k]);s.k=s.k?0:1;
 if(s.k){const nx=S.logs[k][i+1];if(nx&&!nx.w&&s.w)nx.w=s.w;if(!s.d)start(rs,n);wl()}sv();const y=scrollY;render();scrollTo(0,y);if(s.k&&tab!='W'&&!S.pr[S.wk+'|'+tab]&&reqDone(S.wk,tab)){S.pr[S.wk+'|'+tab]=1;sv();coolAsk(tab)}}
 function deldrop(k,i){S.logs[k].splice(i,1);sv();const y=scrollY;render();scrollTo(0,y)}
 function drop(k){S.logs[k].push({w:'',r:'',k:0,d:1});sv();const y=scrollY;render();scrollTo(0,y)}
@@ -231,6 +253,7 @@ function delbw(d){S.bw=S.bw.filter(y=>y.d!=d);sv();render()}
 function guide(){return`<div class="card"><div class="nm">Rest</div><div class="mu">60 s after heavy lifts, 45 s moderate, 30 s isolation, TRX and core. Adjust the timer ±15 s when needed.</div></div>
 <div class="card"><div class="nm">Tempo and RIR</div><div class="mu">Tempo is four numbers: seconds lowering, pause at the bottom, seconds lifting, hold at the top. RIR is reps left in the tank.</div></div>
 <div class="card"><div class="nm">Drop sets (*)</div><div class="mu">Only on the exercises marked * in Weeks 6-7 and 9-11. After your last working set, lower the weight about 20% and continue to near failure with no rest. Log it with + Drop set; tap ✕ to remove one added by mistake.</div></div>
+<div class="card"><div class="nm">Weight suggestions</div><div class="mu">At the start of each session the app suggests a weight from last time and fills it into the boxes. Top of range on every set: add weight (about 2.5-5%, rounded to your equipment). Below the range two sessions in a row: lower 5-10%. Otherwise repeat the weight and add reps. Tap Easy, Right or Too hard after your last set to fine-tune it. You can change any weight, and reset and deload weeks have no suggestions.</div></div>
 <div class="card"><div class="nm">Progression</div><div class="mu">Add the smallest weight jump when every set reaches the top of the rep range at the target RIR. After you finish an exercise, the app shows a tip: add weight, stay at this weight, or repeat and lower it if you fall below the range. If weights are maxed: slow the lowering, add a pause, go single-limb, or add band tension.</div></div>
 <div class="card"><div class="nm">Phases</div><ul class="ul"><li>Week 0: calibrate loads, no failure</li><li>Weeks 1-3: Foundation</li><li>Week 4: Reset (one fewer set)</li><li>Weeks 5-7: Build (drop sets from Week 6)</li><li>Week 8: Reset</li><li>Weeks 9-11: Peak (Week 11 retest)</li><li>Week 12: Deload</li></ul></div>
 <div class="card"><div class="nm">Cool-down stretch</div><div class="mu">After your last exercise, tap Finish workout and then Start stretch (about 3 min). Tap GO for each stretch. Side stretches beep to switch sides. Stretch to mild tension, never pain. TRX stretches have a no-TRX alternative in the cue.</div></div>
